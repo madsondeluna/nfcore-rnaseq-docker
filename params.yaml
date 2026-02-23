@@ -1,0 +1,25 @@
+# ==============================================
+# Parametros do pipeline nf-core/rnaseq
+# Ajustar os caminhos conforme o seu projeto
+# ==============================================
+
+# Entrada
+input: 'samplesheet.csv'
+
+# Saida
+outdir: 'results'
+
+# Genoma de referencia (usar caminhos absolutos ou relativos ao diretorio de execucao)
+fasta: 'data/reference/genome.fa'
+gtf: 'data/reference/genes.gtf'
+
+# Alinhador (opcoes: star_salmon, star_rsem, hisat2)
+aligner: 'star_salmon'
+
+# Se desejar apenas pseudo-alinhamento, descomentar as linhas abaixo:
+# pseudo_aligner: 'salmon'
+# skip_alignment: true
+
+# Recursos computacionais (ajustar conforme disponibilidade)
+# max_memory: '16.GB'
+# max_cpus: 8

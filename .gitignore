@@ -1,0 +1,22 @@
+# Diretorios de trabalho do Nextflow
+work/
+.nextflow/
+.nextflow.log*
+
+# Dados brutos (nao versionar arquivos grandes)
+data/raw_fastq/*.fastq.gz
+data/raw_fastq/*.fq.gz
+data/reference/*.fa
+data/reference/*.fa.gz
+data/reference/*.gtf
+data/reference/*.gtf.gz
+
+# Resultados (manter apenas a estrutura, nao os arquivos grandes)
+results/
+
+# Docker
+*.tar
+
+# Sistema
+.DS_Store
+Thumbs.db

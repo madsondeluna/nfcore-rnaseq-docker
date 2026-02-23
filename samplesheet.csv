@@ -1,0 +1,7 @@
+sample,fastq_1,fastq_2,strandedness
+CONTROLE_REP1,data/raw_fastq/CTRL_1_R1.fastq.gz,data/raw_fastq/CTRL_1_R2.fastq.gz,auto
+CONTROLE_REP2,data/raw_fastq/CTRL_2_R1.fastq.gz,data/raw_fastq/CTRL_2_R2.fastq.gz,auto
+CONTROLE_REP3,data/raw_fastq/CTRL_3_R1.fastq.gz,data/raw_fastq/CTRL_3_R2.fastq.gz,auto
+TRATAMENTO_REP1,data/raw_fastq/TREAT_1_R1.fastq.gz,data/raw_fastq/TREAT_1_R2.fastq.gz,auto
+TRATAMENTO_REP2,data/raw_fastq/TREAT_2_R1.fastq.gz,data/raw_fastq/TREAT_2_R2.fastq.gz,auto
+TRATAMENTO_REP3,data/raw_fastq/TREAT_3_R1.fastq.gz,data/raw_fastq/TREAT_3_R2.fastq.gz,auto
