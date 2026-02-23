@@ -6,18 +6,19 @@ Guia completo para executar análise de RNA-Seq - desde a instalação do Docker
 
 ## Sumário
 
-1. [Visao Geral](#visao-geral)
-2. [Pre-requisitos](#pre-requisitos)
-3. [Etapa 1 - Instalação e Configuração do Docker](#etapa-1---instalação-e-configuração-do-docker)
-4. [Etapa 2 - Instalação do Nextflow](#etapa-2---instalação-do-nextflow)
-5. [Etapa 3 - Organização dos Dados](#etapa-3---organização-dos-dados)
-6. [Etapa 4 - Preparação do Samplesheet](#etapa-4---preparação-do-samplesheet)
-7. [Etapa 5 - Obtenção do Genoma de Referência](#etapa-5---obtenção-do-genoma-de-referência)
-8. [Etapa 6 - Execução do Pipeline nf-core/rnaseq](#etapa-6---execução-do-pipeline-nf-corernaseq)
-9. [Etapa 7 - Interpretação dos Resultados](#etapa-7---interpretação-dos-resultados)
-10. [Etapa 8 - Análise de Expressão Diferencial (DEGs)](#etapa-8---análise-de-expressão-diferencial-degs)
-11. [Resolução de Problemas](#resolução-de-problemas)
-12. [Referências](#referências)
+1. [Visão Geral](#visão-geral)
+2. [RNA-Seq *de novo* vs. RNA-Seq com genoma de referência](#rna-seq-de-novo-vs-rna-seq-com-genoma-de-referência)
+3. [Pré-requisitos](#pré-requisitos)
+4. [Etapa 1 - Instalação e Configuração do Docker](#etapa-1---instalação-e-configuração-do-docker)
+5. [Etapa 2 - Instalação do Nextflow](#etapa-2---instalação-do-nextflow)
+6. [Etapa 3 - Organização dos Dados](#etapa-3---organização-dos-dados)
+7. [Etapa 4 - Preparação do Samplesheet](#etapa-4---preparação-do-samplesheet)
+8. [Etapa 5 - Obtenção do Genoma de Referência](#etapa-5---obtenção-do-genoma-de-referência)
+9. [Etapa 6 - Execução do Pipeline nf-core/rnaseq](#etapa-6---execução-do-pipeline-nf-corernaseq)
+10. [Etapa 7 - Interpretação dos Resultados](#etapa-7---interpretação-dos-resultados)
+11. [Etapa 8 - Análise de Expressão Diferencial (DEGs)](#etapa-8---análise-de-expressão-diferencial-degs)
+12. [Resolução de Problemas](#resolução-de-problemas)
+13. [Referências](#referências)
 
 ---
 
@@ -219,6 +220,76 @@ flowchart LR
     style H fill:#d4763a,stroke:#b35e28,color:#ffffff
     style I fill:#4caf50,stroke:#388e3c,color:#ffffff
 ```
+
+---
+
+## RNA-Seq *de novo* vs. RNA-Seq com genoma de referência
+
+Antes de executar o pipeline, é fundamental entender as duas estratégias principais de análise de RNA-Seq, pois a escolha impacta diretamente nos resultados, na precisão e nos recursos computacionais necessários.
+
+### Princípios de cada abordagem
+
+#### RNA-Seq com genoma de referência (reference-based)
+
+Nesta abordagem, os reads são **alinhados diretamente a um genoma de referência** já disponível para o organismo de estudo. As coordenadas do alinhamento, combinadas com a anotação do genoma (arquivo GTF/GFF), permitem quantificar a expressão de cada gene conhecido.
+
+O fluxo segue a lógica:
+
+```
+Reads FASTQ --> Alinhamento ao genoma (STAR/HISAT2) --> Quantificação (Salmon/featureCounts) --> Contagens por gene
+```
+
+Esta é a abordagem utilizada pelo **nf-core/rnaseq** quando um genoma de referência é fornecido (como no caso de *Vigna unguiculata* a partir do Phytozome). É a estratégia adotada neste protocolo.
+
+#### RNA-Seq *de novo* (de novo assembly)
+
+Quando **não existe um genoma de referência** disponível para o organismo (ou quando o genoma existente é de baixa qualidade), os reads são montados *de novo* em transcritos completos sem a necessidade de um genoma. Ferramentas como **Trinity** realizam essa montagem a partir dos próprios reads.
+
+O fluxo segue a lógica:
+
+```
+Reads FASTQ --> Montagem de novo (Trinity) --> Anotação dos transcritos (BLAST/Trinotate) --> Quantificação --> Contagens por transcrito
+```
+
+O nf-core não possui um pipeline dedicado para montagem *de novo* de transcriptomas. Para essa abordagem, é necessário utilizar ferramentas externas como [Trinity](https://github.com/trinityrnaseq/trinityrnaseq) e [Trinotate](https://github.com/Trinotate/Trinotate).
+
+### Quando usar cada abordagem
+
+| Cenário | Abordagem recomendada |
+|---------|----------------------|
+| Genoma de referência de boa qualidade disponível | Reference-based |
+| Genoma de referência ausente ou de baixa qualidade | *De novo* |
+| Interesse em descobrir novos transcritos/isoformas | *De novo* ou reference-based com StringTie |
+| Análise de expressão diferencial (DEGs) | Reference-based (maior precisão) |
+| Organismos não-modelo sem genoma publicado | *De novo* |
+| Recursos computacionais limitados | Reference-based (menos custoso) |
+
+### Comparação detalhada
+
+| Critério | Reference-based | *De novo* |
+|----------|----------------|-----------|
+| **Requisito principal** | Genoma de referência + anotação (GTF/GFF) | Apenas reads FASTQ |
+| **Ferramentas típicas de alinhamento/montagem** | STAR, HISAT2, Salmon | Trinity, rnaSPAdes, Trans-ABySS |
+| **Precisão na quantificação** | Alta, pois utiliza coordenadas genômicas conhecidas | Moderada, depende da qualidade da montagem |
+| **Detecção de novos transcritos** | Limitada (possível com StringTie) | Alta, pois monta transcritos sem viés de anotação prévia |
+| **Tempo de processamento** | Moderado (horas) | Alto (dias, dependendo do volume de dados) |
+| **Uso de memória RAM** | Moderado (16-32 GB típico) | Alto (64-128 GB ou mais para Trinity) |
+| **Espaço em disco** | Moderado | Alto (montagens intermediárias são volumosas) |
+| **Complexidade da análise** | Menor, pipeline bem definido | Maior, envolve montagem + anotação + filtragem |
+| **Reprodutibilidade** | Alta, com genoma de referência fixo | Depende da versão do montador e dos parâmetros |
+| **Sensibilidade a erros de sequenciamento** | Menor, o genoma serve como guia | Maior, erros podem gerar transcritos quiméricos |
+| **Pipelines nf-core disponíveis** | nf-core/rnaseq | Não disponível (usar Trinity manualmente) |
+| **Anotação funcional** | Já disponível no GTF/GFF | Necessita etapa adicional (Trinotate, BLAST, InterProScan) |
+
+### Qual abordagem este protocolo utiliza
+
+Este protocolo adota a abordagem **reference-based**, utilizando o genoma de *Vigna unguiculata* v1.2 (IT97K-499-35) disponível no [Phytozome v14](https://phytozome-next.jgi.doe.gov/info/Vunguiculata_v1_2) como referência. Esta é a escolha adequada porque:
+
+- O genoma de *V. unguiculata* está bem montado e anotado
+- Permite quantificação precisa por gene utilizando coordenadas genômicas
+- É compatível com o pipeline nf-core/rnaseq
+- Exige menos recursos computacionais do que a montagem *de novo*
+- Facilita a análise de expressão diferencial downstream com DESeq2 ou edgeR
 
 ---
 
