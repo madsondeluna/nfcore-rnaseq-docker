@@ -39,14 +39,14 @@ O pipeline executa as seguintes etapas automaticamente:
 ### Fluxo geral
 
 ```mermaid
-flowchart TD
-    A["FASTQ brutos"] --> B["Controle de Qualidade\nFastQC"]
-    B --> C["Trimagem de Adaptadores\nTrim Galore / fastp"]
-    C --> D["Alinhamento\nSTAR / HISAT2"]
-    D --> E["Quantificacao\nSalmon / featureCounts"]
-    E --> F["Relatorio de Qualidade\nMultiQC"]
-    F --> G["Matrizes de Contagem"]
-    G --> H["Analise Diferencial\nDESeq2 / edgeR"]
+flowchart LR
+    A["FASTQ brutos"] --> B["Controle de<br>Qualidade<br>FastQC"]
+    B --> C["Trimagem<br>Trim Galore"]
+    C --> D["Alinhamento<br>STAR / HISAT2"]
+    D --> E["Quantificacao<br>Salmon"]
+    E --> F["Relatorio<br>MultiQC"]
+    F --> G["Matrizes de<br>Contagem"]
+    G --> H["Analise Diferencial<br>DESeq2 / edgeR"]
     H --> I["Lista de DEGs"]
 
     style A fill:#4a6fa5,stroke:#2d4a7a,color:#ffffff
