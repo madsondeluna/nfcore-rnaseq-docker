@@ -27,16 +27,176 @@ Este protocolo utiliza o pipeline **nf-core/rnaseq** (versão 3.18.0 ou superior
 
 ### O que o pipeline nf-core/rnaseq faz
 
-O pipeline executa as seguintes etapas automaticamente:
+O pipeline nf-core/rnaseq é dividido em **5 estágios principais**, cada um contendo múltiplas ferramentas que são executadas automaticamente. A imagem abaixo (mapa no estilo metrô) ilustra todas as rotas possíveis dentro do pipeline, com diferentes cores representando os diferentes métodos de alinhamento/quantificação disponíveis.
 
-1. **Controle de qualidade dos reads brutos** - FastQC
-2. **Trimagem de adaptadores** - Trim Galore / fastp
-3. **Alinhamento ao genoma de referência** - STAR ou HISAT2
-4. **Quantificação de transcritos** - Salmon, RSEM ou featureCounts
-5. **Controle de qualidade pós-alinhamento** - RSeQC, Qualimap, dupRadar
-6. **Relatório consolidado** - MultiQC
+> Documentação oficial completa: [nf-core/rnaseq](https://nf-co.re/rnaseq/3.22.2/docs/usage/)
 
-### Fluxo geral
+![Mapa do pipeline nf-core/rnaseq no estilo metró, mostrando os 5 estágios de processamento](https://raw.githubusercontent.com/nf-core/rnaseq/3.22.2//docs/images/nf-core-rnaseq_metro_map_grey_animated.svg)
+
+As cores no mapa representam os diferentes métodos disponíveis:
+
+| Cor | Método | Comando |
+|-----|--------|---------|
+| Verde | STAR + Salmon (padrão) | `--aligner star_salmon` |
+| Azul | STAR + RSEM | `--aligner star_rsem` |
+| Amarelo | HISAT2 (sem quantificação integrada) | `--aligner hisat2` |
+| Rosa | Salmon (pseudo-alinhamento) | `--pseudo_aligner salmon` |
+| Roxo | Kallisto (pseudo-alinhamento) | `--pseudo_aligner kallisto` |
+
+---
+
+### Estágio 1 - Pré-processamento
+
+O primeiro estágio prepara os reads brutos para o alinhamento. Todas as ferramentas deste estágio são executadas independentemente do alinhador escolhido.
+
+| Etapa | Ferramenta | O que faz |
+|-------|------------|-----------|
+| Concatenação de reads | `cat` | Se uma amostra foi sequenciada em múltiplas lanes, os arquivos FASTQ são concatenados automaticamente |
+| Controle de qualidade inicial | [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) | Gera relatórios de qualidade dos reads brutos (distribuição de bases, qualidade Phred, conteúdo GC, sequências duplicadas) |
+| Inferência de strandedness | [Salmon](https://salmon.readthedocs.io/) + [fq](https://github.com/stjude-rust-labs/fq) | Quando `strandedness` é definido como `auto`, o pipeline sub-amostra 1 milhão de reads e usa o Salmon para inferir automaticamente a orientação da biblioteca |
+| Extração de UMI | [UMI-tools](https://umi-tools.readthedocs.io/) | (Opcional) Extrai identificadores moleculares únicos (UMIs) dos reads, se aplicável ao protocolo de sequenciamento |
+| Trimagem de adaptadores | [Trim Galore!](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/) ou [fastp](https://github.com/OpenGene/fastp) | Remove adaptadores de sequenciamento e bases de baixa qualidade das extremidades dos reads |
+| Remoção de rRNA | [SortMeRNA](https://github.com/sortmerna/sortmerna) | (Opcional) Remove reads de RNA ribossômico que podem contaminar a biblioteca |
+| Separação de genomas | [BBSplit](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/) | (Opcional) Separa reads provenientes de diferentes organismos em amostras contaminadas ou de xenoenxerto |
+| Controle de qualidade pós-trimagem | [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) | Gera novos relatórios de qualidade após a trimagem para confirmar a melhoria |
+
+Para pular a trimagem (se os dados já foram trimados):
+
+```bash
+nextflow run nf-core/rnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --fasta genome.fa \
+    --gtf genes.gtf \
+    --skip_trimming \
+    -profile docker
+```
+
+Para usar fastp em vez de Trim Galore:
+
+```bash
+nextflow run nf-core/rnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --fasta genome.fa \
+    --gtf genes.gtf \
+    --trimmer fastp \
+    -profile docker
+```
+
+> Documentação dos parâmetros de pré-processamento: [nf-core/rnaseq - Read trimming](https://nf-co.re/rnaseq/3.22.2/docs/usage/#adapter-trimming-options)
+
+---
+
+### Estágio 2 - Alinhamento ao genoma e quantificação
+
+Neste estágio, os reads limpos são alinhados ao genoma de referência. O método padrão é **STAR + Salmon**, mas existem alternativas. Cada rota aparece com uma cor diferente no mapa.
+
+| Rota | Alinhador | Quantificador | Comando |
+|------|-----------|---------------|---------|
+| Padrão (verde) | [STAR](https://github.com/alexdobin/STAR) | [Salmon](https://salmon.readthedocs.io/) | `--aligner star_salmon` |
+| Alternativa (azul) | [STAR](https://github.com/alexdobin/STAR) | [RSEM](https://github.com/deweylab/RSEM) | `--aligner star_rsem` |
+| Alternativa (amarelo) | [HISAT2](http://daehwankimlab.github.io/hisat2/) | - | `--aligner hisat2` |
+
+Após o alinhamento, o pipeline executa automaticamente:
+
+- **UMI-tools dedup** - Remove duplicatas de PCR baseadas em UMIs (se aplicável)
+- **SAMtools** (sort, index, stats) - Ordena, indexa e gera estatísticas dos arquivos BAM
+- **picard MarkDuplicates** - Marca reads duplicados no alinhamento
+- **Salmon quant** (modo de mapeamento) - Quantifica a expressão gênica a partir do alinhamento STAR
+
+```bash
+# Rota padrão: STAR + Salmon (recomendado para a maioria dos casos)
+nextflow run nf-core/rnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --fasta genome.fa \
+    --gtf genes.gtf \
+    --aligner star_salmon \
+    -profile docker
+```
+
+> Documentação das opções de alinhamento: [nf-core/rnaseq - Alignment options](https://nf-co.re/rnaseq/3.22.2/docs/usage/#alignment-options)
+
+---
+
+### Estágio 3 - Pseudo-alinhamento e quantificação
+
+Alternativa mais rápida ao alinhamento tradicional. O pseudo-alinhamento **não gera arquivos BAM** - ele quantifica diretamente a expressão gênica a partir dos reads, sem mapeá-los posição a posição no genoma.
+
+| Rota | Ferramenta | Comando |
+|------|------------|---------|
+| Rosa | [Salmon](https://salmon.readthedocs.io/) | `--pseudo_aligner salmon` |
+| Roxo | [Kallisto](https://pachterlab.github.io/kallisto/) | `--pseudo_aligner kallisto` |
+
+O pseudo-alinhamento é significativamente mais rápido e usa menos memória, sendo ideal para:
+- Análises exploratórias iniciais
+- Máquinas com recursos limitados
+- Estudos focados apenas em quantificação (sem necessidade de BAM)
+
+```bash
+# Pseudo-alinhamento com Salmon (sem alinhamento ao genoma)
+nextflow run nf-core/rnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --fasta genome.fa \
+    --gtf genes.gtf \
+    --pseudo_aligner salmon \
+    --skip_alignment \
+    -profile docker
+```
+
+> Documentação de quantificação: [nf-core/rnaseq - Quantification options](https://nf-co.re/rnaseq/3.22.2/docs/usage/#quantification-options)
+
+---
+
+### Estágio 4 - Pós-processamento
+
+Após o alinhamento, o pipeline gera arquivos auxiliares e executa análises de qualidade do alinhamento.
+
+| Etapa | Ferramenta | O que faz |
+|-------|------------|-----------|
+| Cobertura genômica | [BEDTools genomecov](https://bedtools.readthedocs.io/) | Calcula a cobertura de reads ao longo do genoma |
+| Visualização de cobertura | [bedGraphToBigWig](https://genome.ucsc.edu/goldenPath/help/bigWig.html) | Converte arquivos de cobertura para o formato BigWig, visualizável em genome browsers (IGV, UCSC) |
+| Montagem de transcritos | [StringTie](https://ccb.jhu.edu/software/stringtie/) | (Opcional) Monta transcritos a partir do alinhamento, útil para descoberta de novos transcritos |
+
+Esses arquivos permitem visualizar a cobertura de sequenciamento em ferramentas como o [IGV (Integrative Genomics Viewer)](https://igv.org/).
+
+---
+
+### Estágio 5 - Controle de qualidade final
+
+O último estágio avalia a qualidade geral do experimento de RNA-Seq a partir de múltiplas perspectivas.
+
+| Etapa | Ferramenta | O que avalia |
+|-------|------------|--------------|
+| Relatório integrado | [MultiQC](https://multiqc.info/) | Consolida todas as métricas de QC em um único relatório HTML interativo |
+| Complexidade da biblioteca | [Preseq](http://smithlabresearch.org/software/preseq/) | Estima a complexidade da biblioteca e prediz a cobertura com sequenciamento adicional |
+| Qualidade do alinhamento | [RSeQC](http://rseqc.sourceforge.net/) (múltiplos módulos) | Avalia distribuição de reads por região gênica, saturação de junções, uniformidade de cobertura, inferência de strandedness |
+| Qualidade por região | [Qualimap rnaseq](http://qualimap.conesalab.org/) | Avalia a qualidade do alinhamento por região genômica (exons, introns, intergênico) |
+| Taxa de duplicação | [dupRadar](https://bioconductor.org/packages/dupRadar/) | Avalia se a taxa de duplicação é proporcional à expressão (esperado) ou indica viés de amplificação |
+| PCA exploratório | [DESeq2](https://bioconductor.org/packages/DESeq2/) (apenas PCA) | Gera análise de componentes principais para visualizar agrupamento das amostras |
+| Contaminação | [Kraken2](https://ccb.jhu.edu/software/kraken2/) / [Bracken](https://ccb.jhu.edu/software/bracken/) | (Opcional) Identifica possíveis contaminações por outros organismos nos reads não alinhados |
+
+O relatório MultiQC é o ponto de partida para avaliar a qualidade do experimento. Para habilitá-lo com triagem de contaminação:
+
+```bash
+nextflow run nf-core/rnaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --fasta genome.fa \
+    --gtf genes.gtf \
+    --aligner star_salmon \
+    --contaminant_screening kraken2 \
+    --kraken2_db /caminho/para/banco_kraken2 \
+    -profile docker
+```
+
+> Documentação completa dos estágios: [nf-core/rnaseq - Output](https://nf-co.re/rnaseq/3.22.2/docs/output/)
+
+---
+
+### Fluxo geral simplificado
 
 ```mermaid
 flowchart LR
@@ -44,7 +204,7 @@ flowchart LR
     B --> C["Trimagem<br>Trim Galore"]
     C --> D["Alinhamento<br>STAR / HISAT2"]
     D --> E["Quantificação<br>Salmon"]
-    E --> F["Relatorio<br>MultiQC"]
+    E --> F["Relatório<br>MultiQC"]
     F --> G["Matrizes de<br>Contagem"]
     G --> H["Análise Diferencial<br>DESeq2 / edgeR"]
     H --> I["Lista de DEGs"]
@@ -376,7 +536,7 @@ nextflow run nf-core/rnaseq \
     --outdir results/test
 ```
 
-Este teste usa um pequeno conjunto de dados incluido no pipeline. Se finalizar sem erros, o ambienteestá pronto.
+Este teste usa um pequeno conjunto de dados incluído no pipeline. Se finalizar sem erros, o ambiente está pronto.
 
 ### 6.3 Executar o pipeline com seus dados
 
@@ -406,7 +566,7 @@ nextflow run nf-core/rnaseq \
 
 ### 6.5 Exemplos de execução com diferentes alinhadores
 
-#### Usando STAR + Salmon (padrao, recomendado)
+#### Usando STAR + Salmon (padrão, recomendado)
 
 ```bash
 nextflow run nf-core/rnaseq \
