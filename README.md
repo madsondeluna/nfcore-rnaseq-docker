@@ -1082,8 +1082,3 @@ rm -rf work/
 - **Salmon:** Patro R et al. Salmon provides fast and bias-aware quantification of transcript expression. Nature Methods. 2017;14:417-419.
 - **Ewels PA et al.** The nf-core framework for community-curated bioinformatics pipelines. Nature Biotechnology. 2020;38:276-278.
 
----
-
-## Licença
-
-Este protocolo é disponibilizado sob a licença MIT.
