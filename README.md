@@ -1,6 +1,6 @@
 # Pipeline de RNA-Seq com nf-core/rnaseq e Docker
 
-Guia completo para executar analise de RNA-Seq -- desde a instalacao do Docker ate a extracao de genes diferencialmente expressos (DEGs) -- utilizando o pipeline [nf-core/rnaseq](https://nf-co.re/rnaseq) com containers Docker.
+Guia completo para executar analise de RNA-Seq - desde a instalacao do Docker ate a extracao de genes diferencialmente expressos (DEGs) - utilizando o pipeline [nf-core/rnaseq](https://nf-co.re/rnaseq) com containers Docker.
 
 ---
 
@@ -8,14 +8,14 @@ Guia completo para executar analise de RNA-Seq -- desde a instalacao do Docker a
 
 1. [Visao Geral](#visao-geral)
 2. [Pre-requisitos](#pre-requisitos)
-3. [Etapa 1 -- Instalacao e Configuracao do Docker](#etapa-1----instalacao-e-configuracao-do-docker)
-4. [Etapa 2 -- Instalacao do Nextflow](#etapa-2----instalacao-do-nextflow)
-5. [Etapa 3 -- Organizacao dos Dados](#etapa-3----organizacao-dos-dados)
-6. [Etapa 4 -- Preparacao do Samplesheet](#etapa-4----preparacao-do-samplesheet)
-7. [Etapa 5 -- Obtencao do Genoma de Referencia](#etapa-5----obtencao-do-genoma-de-referencia)
-8. [Etapa 6 -- Execucao do Pipeline nf-core/rnaseq](#etapa-6----execucao-do-pipeline-nf-corernaseq)
-9. [Etapa 7 -- Interpretacao dos Resultados](#etapa-7----interpretacao-dos-resultados)
-10. [Etapa 8 -- Analise de Expressao Diferencial (DEGs)](#etapa-8----analise-de-expressao-diferencial-degs)
+3. [Etapa 1 - Instalacao e Configuracao do Docker](#etapa-1---instalacao-e-configuracao-do-docker)
+4. [Etapa 2 - Instalacao do Nextflow](#etapa-2---instalacao-do-nextflow)
+5. [Etapa 3 - Organizacao dos Dados](#etapa-3---organizacao-dos-dados)
+6. [Etapa 4 - Preparacao do Samplesheet](#etapa-4---preparacao-do-samplesheet)
+7. [Etapa 5 - Obtencao do Genoma de Referencia](#etapa-5---obtencao-do-genoma-de-referencia)
+8. [Etapa 6 - Execucao do Pipeline nf-core/rnaseq](#etapa-6---execucao-do-pipeline-nf-corernaseq)
+9. [Etapa 7 - Interpretacao dos Resultados](#etapa-7---interpretacao-dos-resultados)
+10. [Etapa 8 - Analise de Expressao Diferencial (DEGs)](#etapa-8---analise-de-expressao-diferencial-degs)
 11. [Resolucao de Problemas](#resolucao-de-problemas)
 12. [Referencias](#referencias)
 
@@ -29,12 +29,12 @@ Este protocolo utiliza o pipeline **nf-core/rnaseq** (versao 3.18.0 ou superior)
 
 O pipeline executa as seguintes etapas automaticamente:
 
-1. **Controle de qualidade dos reads brutos** -- FastQC
-2. **Trimagem de adaptadores** -- Trim Galore / fastp
-3. **Alinhamento ao genoma de referencia** -- STAR ou HISAT2
-4. **Quantificacao de transcritos** -- Salmon, RSEM ou featureCounts
-5. **Controle de qualidade pos-alinhamento** -- RSeQC, Qualimap, dupRadar
-6. **Relatorio consolidado** -- MultiQC
+1. **Controle de qualidade dos reads brutos** - FastQC
+2. **Trimagem de adaptadores** - Trim Galore / fastp
+3. **Alinhamento ao genoma de referencia** - STAR ou HISAT2
+4. **Quantificacao de transcritos** - Salmon, RSEM ou featureCounts
+5. **Controle de qualidade pos-alinhamento** - RSeQC, Qualimap, dupRadar
+6. **Relatorio consolidado** - MultiQC
 
 ### Fluxo geral
 
@@ -77,11 +77,11 @@ Lista de DEGs
 | CPU | 4 nucleos | 8 nucleos ou mais |
 | Sistema Operacional | Linux, macOS ou Windows (via WSL2) | Linux |
 | Java | versao 11 ou superior | versao 17 |
-| Conexao com internet | necessaria para download de containers e genomas | -- |
+| Conexao com internet | necessaria para download de containers e genomas | - |
 
 ---
 
-## Etapa 1 -- Instalacao e Configuracao do Docker
+## Etapa 1 - Instalacao e Configuracao do Docker
 
 O Docker permite executar softwares em containers isolados, garantindo que todas as dependencias estejam corretas e que o ambiente seja reprodutivel.
 
@@ -166,7 +166,7 @@ Para analises de RNA-Seq, e recomendavel alocar recursos adequados ao Docker:
 
 ---
 
-## Etapa 2 -- Instalacao do Nextflow
+## Etapa 2 - Instalacao do Nextflow
 
 O Nextflow e o motor de workflow que executa o pipeline nf-core/rnaseq. Ele orquestra os containers Docker automaticamente.
 
@@ -215,7 +215,7 @@ pip install nf-core
 
 ---
 
-## Etapa 3 -- Organizacao dos Dados
+## Etapa 3 - Organizacao dos Dados
 
 ### 3.1 Estrutura de diretorios recomendada
 
@@ -259,7 +259,7 @@ scp usuario@servidor:/caminho/dos/dados/*.fastq.gz data/raw_fastq/
 
 ---
 
-## Etapa 4 -- Preparacao do Samplesheet
+## Etapa 4 - Preparacao do Samplesheet
 
 O samplesheet e um arquivo CSV que informa ao pipeline quais amostras processar, onde estao os arquivos FASTQ e qual a orientacao da biblioteca (strandedness).
 
@@ -310,13 +310,13 @@ TRATAMENTO_REP2,/caminho/completo/data/raw_fastq/TREAT_2.fastq.gz,,auto
 ### 4.5 Regras importantes
 
 - Usar **caminhos absolutos** (completos) para os arquivos FASTQ.
-- Se uma mesma amostra biologica foi sequenciada em multiplas lanes, repetir o mesmo nome na coluna `sample` -- o pipeline concatenara os reads automaticamente.
+- Se uma mesma amostra biologica foi sequenciada em multiplas lanes, repetir o mesmo nome na coluna `sample` - o pipeline concatenara os reads automaticamente.
 - Nao usar espacos nos nomes das amostras (usar underscores).
 - Garantir que os arquivos FASTQ estejam compactados (`.fastq.gz`).
 
 ---
 
-## Etapa 5 -- Obtencao do Genoma de Referencia
+## Etapa 5 - Obtencao do Genoma de Referencia
 
 O pipeline precisa de um genoma de referencia (FASTA) e de uma anotacao (GTF) para realizar o alinhamento e a quantificacao.
 
@@ -358,7 +358,7 @@ A abordagem recomendada e fornecer os arquivos explicitamente com `--fasta` e `-
 
 ---
 
-## Etapa 6 -- Execucao do Pipeline nf-core/rnaseq
+## Etapa 6 - Execucao do Pipeline nf-core/rnaseq
 
 ### 6.1 Verificar se Docker esta em execucao
 
@@ -504,7 +504,7 @@ nextflow run nf-core/rnaseq \
 
 ---
 
-## Etapa 7 -- Interpretacao dos Resultados
+## Etapa 7 - Interpretacao dos Resultados
 
 Apos a execucao bem-sucedida, os resultados estarao no diretorio especificado em `--outdir`.
 
@@ -564,7 +564,7 @@ Pontos a verificar no relatorio:
 
 ---
 
-## Etapa 8 -- Analise de Expressao Diferencial (DEGs)
+## Etapa 8 - Analise de Expressao Diferencial (DEGs)
 
 Apos obter as matrizes de contagem do pipeline nf-core/rnaseq, existem duas abordagens para realizar a analise de expressao diferencial.
 
