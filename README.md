@@ -1,29 +1,29 @@
 # Pipeline de RNA-Seq com nf-core/rnaseq e Docker
 
-Guia completo para executar analise de RNA-Seq - desde a instalacao do Docker ate a extracao de genes diferencialmente expressos (DEGs) - utilizando o pipeline [nf-core/rnaseq](https://nf-co.re/rnaseq) com containers Docker.
+Guia completo para executar análise de RNA-Seq - desde a instalação do Docker até a extração de genes diferencialmente expressos (DEGs) - utilizando o pipeline [nf-core/rnaseq](https://nf-co.re/rnaseq) com containers Docker.
 
 ---
 
-## Sumario
+## Sumário
 
 1. [Visao Geral](#visao-geral)
 2. [Pre-requisitos](#pre-requisitos)
-3. [Etapa 1 - Instalacao e Configuracao do Docker](#etapa-1---instalacao-e-configuracao-do-docker)
-4. [Etapa 2 - Instalacao do Nextflow](#etapa-2---instalacao-do-nextflow)
-5. [Etapa 3 - Organizacao dos Dados](#etapa-3---organizacao-dos-dados)
-6. [Etapa 4 - Preparacao do Samplesheet](#etapa-4---preparacao-do-samplesheet)
-7. [Etapa 5 - Obtencao do Genoma de Referencia](#etapa-5---obtencao-do-genoma-de-referencia)
-8. [Etapa 6 - Execucao do Pipeline nf-core/rnaseq](#etapa-6---execucao-do-pipeline-nf-corernaseq)
-9. [Etapa 7 - Interpretacao dos Resultados](#etapa-7---interpretacao-dos-resultados)
-10. [Etapa 8 - Analise de Expressao Diferencial (DEGs)](#etapa-8---analise-de-expressao-diferencial-degs)
-11. [Resolucao de Problemas](#resolucao-de-problemas)
-12. [Referencias](#referencias)
+3. [Etapa 1 - Instalação e Configuração do Docker](#etapa-1---instalação-e-configuração-do-docker)
+4. [Etapa 2 - Instalação do Nextflow](#etapa-2---instalação-do-nextflow)
+5. [Etapa 3 - Organização dos Dados](#etapa-3---organização-dos-dados)
+6. [Etapa 4 - Preparação do Samplesheet](#etapa-4---preparação-do-samplesheet)
+7. [Etapa 5 - Obtenção do Genoma de Referência](#etapa-5---obtenção-do-genoma-de-referência)
+8. [Etapa 6 - Execução do Pipeline nf-core/rnaseq](#etapa-6---execução-do-pipeline-nf-corernaseq)
+9. [Etapa 7 - Interpretação dos Resultados](#etapa-7---interpretação-dos-resultados)
+10. [Etapa 8 - Análise de Expressão Diferencial (DEGs)](#etapa-8---análise-de-expressão-diferencial-degs)
+11. [Resolução de Problemas](#resolução-de-problemas)
+12. [Referências](#referências)
 
 ---
 
-## Visao Geral
+## Visão Geral
 
-Este protocolo utiliza o pipeline **nf-core/rnaseq** (versao 3.18.0 ou superior) para processar dados brutos de RNA-Seq (arquivos FASTQ) e gerar matrizes de contagem de genes. Posteriormente, utiliza o pipeline **nf-core/differentialabundance** para identificar genes diferencialmente expressos (DEGs).
+Este protocolo utiliza o pipeline **nf-core/rnaseq** (versão 3.18.0 ou superior) para processar dados brutos de RNA-Seq (arquivos FASTQ) e gerar matrizes de contagem de genes. Posteriormente, utiliza o pipeline **nf-core/differentialabundance** para identificar genes diferencialmente expressos (DEGs).
 
 ### O que o pipeline nf-core/rnaseq faz
 
@@ -31,10 +31,10 @@ O pipeline executa as seguintes etapas automaticamente:
 
 1. **Controle de qualidade dos reads brutos** - FastQC
 2. **Trimagem de adaptadores** - Trim Galore / fastp
-3. **Alinhamento ao genoma de referencia** - STAR ou HISAT2
-4. **Quantificacao de transcritos** - Salmon, RSEM ou featureCounts
-5. **Controle de qualidade pos-alinhamento** - RSeQC, Qualimap, dupRadar
-6. **Relatorio consolidado** - MultiQC
+3. **Alinhamento ao genoma de referência** - STAR ou HISAT2
+4. **Quantificação de transcritos** - Salmon, RSEM ou featureCounts
+5. **Controle de qualidade pós-alinhamento** - RSeQC, Qualimap, dupRadar
+6. **Relatório consolidado** - MultiQC
 
 ### Fluxo geral
 
@@ -43,10 +43,10 @@ flowchart LR
     A["FASTQ brutos"] --> B["Controle de<br>Qualidade<br>FastQC"]
     B --> C["Trimagem<br>Trim Galore"]
     C --> D["Alinhamento<br>STAR / HISAT2"]
-    D --> E["Quantificacao<br>Salmon"]
+    D --> E["Quantificação<br>Salmon"]
     E --> F["Relatorio<br>MultiQC"]
     F --> G["Matrizes de<br>Contagem"]
-    G --> H["Analise Diferencial<br>DESeq2 / edgeR"]
+    G --> H["Análise Diferencial<br>DESeq2 / edgeR"]
     H --> I["Lista de DEGs"]
 
     style A fill:#4a6fa5,stroke:#2d4a7a,color:#ffffff
@@ -62,30 +62,30 @@ flowchart LR
 
 ---
 
-## Pre-requisitos
+## Pré-requisitos
 
-| Requisito | Minimo | Recomendado |
+| Requisito | Mínimo | Recomendado |
 |-----------|--------|-------------|
 | RAM | 8 GB | 16 GB ou mais |
 | Disco | 50 GB livres | 200 GB ou mais |
-| CPU | 4 nucleos | 8 nucleos ou mais |
+| CPU | 4 núcleos | 8 núcleos ou mais |
 | Sistema Operacional | Linux, macOS ou Windows (via WSL2) | Linux |
-| Java | versao 11 ou superior | versao 17 |
-| Conexao com internet | necessaria para download de containers e genomas | - |
+| Java | versão 11 ou superior | versão 17 |
+| Conexão com internet | necessária para download de containers e genomas | - |
 
 ---
 
-## Etapa 1 - Instalacao e Configuracao do Docker
+## Etapa 1 - Instalação e Configuração do Docker
 
-O Docker permite executar softwares em containers isolados, garantindo que todas as dependencias estejam corretas e que o ambiente seja reprodutivel.
+O Docker permite executar softwares em containers isolados, garantindo que todas as dependências estejam corretas e que o ambiente seja reprodutivel.
 
-### 1.1 Instalacao no Linux (Ubuntu/Debian)
+### 1.1 Instalação no Linux (Ubuntu/Debian)
 
 ```bash
 # Atualizar os pacotes do sistema
 sudo apt-get update
 
-# Instalar dependencias necessarias
+# Instalar dependências necessarias
 sudo apt-get install -y \
     ca-certificates \
     curl \
@@ -109,68 +109,68 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ```
 
-### 1.2 Instalacao no macOS
+### 1.2 Instalação no macOS
 
 1. Acessar o site oficial: https://www.docker.com/products/docker-desktop/
 2. Baixar o **Docker Desktop** para macOS (Apple Silicon ou Intel, conforme seu hardware).
 3. Abrir o arquivo `.dmg` baixado.
-4. Arrastar o icone do Docker para a pasta **Applications**.
+4. Arrastar o ícone do Docker para a pasta **Applications**.
 5. Abrir o Docker Desktop a partir do Launchpad ou da pasta Applications.
-6. Aguardar a inicializacao completa (o icone da baleia na barra de menu ficara estavel).
+6. Aguardar a inicialização completa (o ícone da baleia na barra de menu ficará estável).
 
-### 1.3 Instalacao no Windows
+### 1.3 Instalação no Windows
 
 1. Acessar https://www.docker.com/products/docker-desktop/
 2. Baixar o **Docker Desktop** para Windows.
-3. Executar o instalador e seguir as instrucoes na tela.
-4. **Importante:** habilitar o WSL2 quando solicitado durante a instalacao.
+3. Executar o instalador e seguir as instruções na tela.
+4. **Importante:** habilitar o WSL2 quando solicitado durante a instalação.
 5. Reiniciar o computador se solicitado.
-6. Abrir o Docker Desktop e aguardar a inicializacao.
+6. Abrir o Docker Desktop e aguardar a inicialização.
 
-### 1.4 Configuracao pos-instalacao (Linux)
+### 1.4 Configuração pós-instalação (Linux)
 
-Por padrao no Linux, o Docker exige permissoes de superusuario. Para executar sem `sudo`:
+Por padrão no Linux, o Docker exige permissões de superusuário. Para executar sem `sudo`:
 
 ```bash
-# Adicionar seu usuario ao grupo docker
+# Adicionar seu usuário ao grupo docker
 sudo usermod -aG docker $USER
 
-# Aplicar a mudanca (necessario logout/login, ou executar)
+# Aplicar a mudança (necessario logout/login, ou executar)
 newgrp docker
 ```
 
-### 1.5 Verificar se o Docker esta funcionando
+### 1.5 Verificar se o Docker está funcionando
 
 ```bash
-# Verificar a versao instalada
+# Verificar a versão instalada
 docker --version
 
 # Executar o container de teste
 docker run hello-world
 ```
 
-Se a mensagem "Hello from Docker!" aparecer, a instalacao foi bem-sucedida.
+Se a mensagem "Hello from Docker!" aparecer, a instalação foi bem-sucedida.
 
 ### 1.6 Configurar recursos do Docker
 
-Para analises de RNA-Seq, e recomendavel alocar recursos adequados ao Docker:
+Para análises de RNA-Seq, é recomendável alocar recursos adequados ao Docker:
 
-- **Docker Desktop (macOS/Windows):** abrir Docker Desktop > Settings > Resources > ajustar CPU, memoria e disco conforme necessidade.
-- **Linux:** o Docker utiliza os recursos do host diretamente, sem necessidade de configuracao adicional.
+- **Docker Desktop (macOS/Windows):** abrir Docker Desktop > Settings > Resources > ajustar CPU, memória e disco conforme necessidade.
+- **Linux:** o Docker utiliza os recursos do host diretamente, sem necessidade de configuração adicional.
 
 ---
 
-## Etapa 2 - Instalacao do Nextflow
+## Etapa 2 - Instalação do Nextflow
 
-O Nextflow e o motor de workflow que executa o pipeline nf-core/rnaseq. Ele orquestra os containers Docker automaticamente.
+O Nextflow é o motor de workflow que executa o pipeline nf-core/rnaseq. Ele orquestra os containers Docker automaticamente.
 
-### 2.1 Verificar se o Java esta instalado
+### 2.1 Verificar se o Javaestá instalado
 
 ```bash
 java -version
 ```
 
-Se o Java nao estiver instalado ou for inferior a versao 11:
+Se o Java não estiver instalado ou for inferior à versão 11:
 
 ```bash
 # Ubuntu/Debian
@@ -186,14 +186,14 @@ brew install openjdk@17
 # Baixar e instalar o Nextflow
 curl -s https://get.nextflow.io | bash
 
-# Tornar o binario executavel
+# Tornar o binario executável
 chmod +x nextflow
 
-# Mover para um diretorio no PATH do sistema
+# Mover para um diretório no PATH do sistema
 sudo mv nextflow /usr/local/bin/
 ```
 
-### 2.3 Verificar a instalacao
+### 2.3 Verificar a instalação
 
 ```bash
 nextflow -version
@@ -201,7 +201,7 @@ nextflow -version
 
 ### 2.4 (Opcional) Instalar as ferramentas de linha de comando do nf-core
 
-As ferramentas nf-core nao sao obrigatorias para rodar o pipeline, mas facilitam tarefas como baixar pipelines e gerar samplesheets.
+As ferramentas nf-core não são obrigatórias para rodar o pipeline, mas facilitam tarefas como baixar pipelines e gerar samplesheets.
 
 ```bash
 pip install nf-core
@@ -209,11 +209,11 @@ pip install nf-core
 
 ---
 
-## Etapa 3 - Organizacao dos Dados
+## Etapa 3 - Organização dos Dados
 
-### 3.1 Estrutura de diretorios recomendada
+### 3.1 Estrutura de diretórios recomendada
 
-Criar a seguinte estrutura antes de iniciar a analise:
+Criar a seguinte estrutura antes de iniciar a análise:
 
 ```
 projeto_rnaseq/
@@ -224,15 +224,15 @@ projeto_rnaseq/
 │   │   ├── amostra2_R1.fastq.gz
 │   │   ├── amostra2_R2.fastq.gz
 │   │   └── ...
-│   └── reference/           # Genoma de referencia
+│   └── reference/           # Genoma de referência
 │       ├── genome.fa
 │       └── genes.gtf
 ├── samplesheet.csv           # Samplesheet de entrada
 ├── results/                  # Resultados do pipeline
-└── work/                     # Diretorio de trabalho do Nextflow
+└── work/                     # Diretório de trabalho do Nextflow
 ```
 
-### 3.2 Criar os diretorios
+### 3.2 Criar os diretórios
 
 ```bash
 mkdir -p projeto_rnaseq/{data/{raw_fastq,reference},results}
@@ -241,29 +241,29 @@ cd projeto_rnaseq
 
 ### 3.3 Transferir os arquivos FASTQ
 
-Copiar os arquivos FASTQ brutos para o diretorio `data/raw_fastq/`. Os arquivos devem estar compactados com gzip (extensao `.fastq.gz` ou `.fq.gz`).
+Copiar os arquivos FASTQ brutos para o diretório `data/raw_fastq/`. Os arquivos devem estar compactados com gzip (extensao `.fastq.gz` ou `.fq.gz`).
 
 ```bash
 # Exemplo: copiar de um HD externo
 cp /media/hd_externo/fastq/*.fastq.gz data/raw_fastq/
 
 # Exemplo: baixar de um servidor via scp
-scp usuario@servidor:/caminho/dos/dados/*.fastq.gz data/raw_fastq/
+scp usuário@servidor:/caminho/dos/dados/*.fastq.gz data/raw_fastq/
 ```
 
 ---
 
-## Etapa 4 - Preparacao do Samplesheet
+## Etapa 4 - Preparação do Samplesheet
 
-O samplesheet e um arquivo CSV que informa ao pipeline quais amostras processar, onde estao os arquivos FASTQ e qual a orientacao da biblioteca (strandedness).
+O samplesheet é um arquivo CSV que informa ao pipeline quais amostras processar, onde estão os arquivos FASTQ e qual a orientação da biblioteca (strandedness).
 
 ### 4.1 Formato do samplesheet
 
-O arquivo deve conter exatamente 4 colunas, separadas por virgula, com cabecalho:
+O arquivo deve conter exatamente 4 colunas, separadas por vírgula, com cabeçalho:
 
-| Coluna | Descricao |
+| Coluna | Descrição |
 |--------|-----------|
-| `sample` | Nome da amostra (identificador unico por amostra biologica) |
+| `sample` | Nome da amostra (identificador único por amostra biologica) |
 | `fastq_1` | Caminho completo para o arquivo FASTQ R1 (forward) |
 | `fastq_2` | Caminho completo para o arquivo FASTQ R2 (reverse). Deixar vazio para single-end |
 | `strandedness` | Orientacao da biblioteca: `unstranded`, `forward`, `reverse` ou `auto` |
@@ -297,22 +297,22 @@ TRATAMENTO_REP2,/caminho/completo/data/raw_fastq/TREAT_2.fastq.gz,,auto
 | Valor | Quando usar |
 |-------|-------------|
 | `auto` | Na duvida, usar este. O pipeline detecta automaticamente usando Salmon |
-| `unstranded` | Quando a biblioteca nao preserva informacao de fita (ex.: TruSeq unstranded) |
+| `unstranded` | Quando a biblioteca não preserva informação de fita (ex.: TruSeq unstranded) |
 | `forward` | Biblioteca strand-specific no sentido forward (ex.: Ligation, dUTP - SMARTer) |
 | `reverse` | Biblioteca strand-specific no sentido reverse (ex.: TruSeq Stranded, maioria dos kits Illumina atuais) |
 
 ### 4.5 Regras importantes
 
 - Usar **caminhos absolutos** (completos) para os arquivos FASTQ.
-- Se uma mesma amostra biologica foi sequenciada em multiplas lanes, repetir o mesmo nome na coluna `sample` - o pipeline concatenara os reads automaticamente.
-- Nao usar espacos nos nomes das amostras (usar underscores).
+- Se uma mesma amostra biológica foi sequenciada em múltiplas lanes, repetir o mesmo nome na coluna `sample` - o pipeline concatenará os reads automaticamente.
+- Não usar espacos nos nomes das amostras (usar underscores).
 - Garantir que os arquivos FASTQ estejam compactados (`.fastq.gz`).
 
 ---
 
-## Etapa 5 - Obtencao do Genoma de Referencia
+## Etapa 5 - Obtenção do Genoma de Referência
 
-O pipeline precisa de um genoma de referencia (FASTA) e de uma anotacao (GTF) para realizar o alinhamento e a quantificacao.
+O pipeline precisa de um genoma de referência (FASTA) e de uma anotação (GTF) para realizar o alinhamento e a quantificação.
 
 ### 5.1 Fontes comuns de genomas
 
@@ -332,43 +332,43 @@ cd data/reference/
 wget https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
 gunzip Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
 
-# Baixar a anotacao GTF
+# Baixar a anotação GTF
 wget https://ftp.ensembl.org/pub/release-112/gtf/homo_sapiens/Homo_sapiens.GRCh38.112.gtf.gz
 gunzip Homo_sapiens.GRCh38.112.gtf.gz
 
 cd ../..
 ```
 
-### 5.3 Usar genomas pre-configurados do iGenomes (alternativa)
+### 5.3 Usar genomas pré-configurados do iGenomes (alternativa)
 
-O pipeline suporta genomas pre-configurados do iGenomes atraves do parametro `--genome`. No entanto, essa abordagem **nao e recomendada** pela equipe do nf-core, pois os genomas podem estar desatualizados.
+O pipeline suporta genomas pré-configurados do iGenomes através do parâmetro `--genome`. No entanto, essa abordagem **não é recomendada** pela equipe do nf-core, pois os genomas podem estar desatualizados.
 
 ```bash
 # Exemplo (nao recomendado)
 --genome GRCh38
 ```
 
-A abordagem recomendada e fornecer os arquivos explicitamente com `--fasta` e `--gtf`.
+A abordagem recomendada é fornecer os arquivos explicitamente com `--fasta` e `--gtf`.
 
 ---
 
-## Etapa 6 - Execucao do Pipeline nf-core/rnaseq
+## Etapa 6 - Execução do Pipeline nf-core/rnaseq
 
-### 6.1 Verificar se Docker esta em execucao
+### 6.1 Verificar se Docker está em execução
 
-Antes de iniciar, confirmar que o Docker esta rodando:
+Antes de iniciar, confirmar que o Docker está rodando:
 
 ```bash
 docker info
 ```
 
-Se houver erro de conexao, iniciar o Docker:
+Se houver erro de conexão, iniciar o Docker:
 - **Linux:** `sudo systemctl start docker`
 - **macOS/Windows:** abrir o aplicativo Docker Desktop.
 
 ### 6.2 (Opcional) Executar o teste do pipeline
 
-Antes de rodar seus dados, e recomendavel executar um teste para garantir que tudo esta configurado corretamente:
+Antes de rodar seus dados, é recomendável executar um teste para garantir que tudo está configurado corretamente:
 
 ```bash
 nextflow run nf-core/rnaseq \
@@ -376,7 +376,7 @@ nextflow run nf-core/rnaseq \
     --outdir results/test
 ```
 
-Este teste usa um pequeno conjunto de dados incluido no pipeline. Se finalizar sem erros, o ambiente esta pronto.
+Este teste usa um pequeno conjunto de dados incluido no pipeline. Se finalizar sem erros, o ambienteestá pronto.
 
 ### 6.3 Executar o pipeline com seus dados
 
@@ -389,22 +389,22 @@ nextflow run nf-core/rnaseq \
     -profile docker
 ```
 
-### 6.4 Parametros importantes
+### 6.4 Parâmetros importantes
 
-| Parametro | Descricao | Exemplo |
+| Parâmetro | Descrição | Exemplo |
 |-----------|-----------|---------|
 | `--input` | Caminho para o samplesheet CSV | `samplesheet.csv` |
-| `--outdir` | Diretorio de saida dos resultados | `results` |
-| `--fasta` | Genoma de referencia em formato FASTA | `data/reference/genome.fa` |
+| `--outdir` | Diretório de saída dos resultados | `results` |
+| `--fasta` | Genoma de referência em formato FASTA | `data/reference/genome.fa` |
 | `--gtf` | Anotacao do genoma em formato GTF | `data/reference/genes.gtf` |
-| `-profile` | Perfil de execucao (usar `docker`) | `docker` |
-| `--aligner` | Alinhador a ser utilizado | `star_salmon` (padrao), `star_rsem`, `hisat2` |
+| `-profile` | Perfil de execução (usar `docker`) | `docker` |
+| `--aligner` | Alinhador a ser utilizado | `star_salmon` (padrão), `star_rsem`, `hisat2` |
 | `--pseudo_aligner` | Pseudo-alinhador (sem alinhamento ao genoma) | `salmon` |
 | `--skip_trimming` | Pular a etapa de trimagem | `true` ou `false` |
 | `--extra_trimgalore_args` | Argumentos extras para Trim Galore | `'--clip_r1 10'` |
-| `--min_mapped_reads` | Percentual minimo de reads mapeados | `5` (padrao) |
+| `--min_mapped_reads` | Percentual mínimo de reads mapeados | `5` (padrão) |
 
-### 6.5 Exemplos de execucao com diferentes alinhadores
+### 6.5 Exemplos de execução com diferentes alinhadores
 
 #### Usando STAR + Salmon (padrao, recomendado)
 
@@ -418,7 +418,7 @@ nextflow run nf-core/rnaseq \
     -profile docker
 ```
 
-#### Usando apenas Salmon (pseudo-alinhamento, mais rapido)
+#### Usando apenas Salmon (pseudo-alinhamento, mais rápido)
 
 ```bash
 nextflow run nf-core/rnaseq \
@@ -443,9 +443,9 @@ nextflow run nf-core/rnaseq \
     -profile docker
 ```
 
-### 6.6 Salvar os parametros em um arquivo YAML (recomendado)
+### 6.6 Salvar os parâmetros em um arquivo YAML (recomendado)
 
-Para reprodutibilidade, salvar todos os parametros em um arquivo `params.yaml`:
+Para reprodutibilidade, salvar todos os parâmetros em um arquivo `params.yaml`:
 
 ```yaml
 input: 'samplesheet.csv'
@@ -463,9 +463,9 @@ nextflow run nf-core/rnaseq \
     -params-file params.yaml
 ```
 
-### 6.7 Retomar uma execucao interrompida
+### 6.7 Retomar uma execução interrompida
 
-Se o pipeline falhar no meio da execucao (queda de energia, falta de memoria, etc.), usar o parametro `-resume` para continuar de onde parou:
+Se o pipeline falhar no meio da execução (queda de energia, falta de memória, etc.), usar o parâmetro `-resume` para continuar de onde parou:
 
 ```bash
 nextflow run nf-core/rnaseq \
@@ -474,20 +474,20 @@ nextflow run nf-core/rnaseq \
     -resume
 ```
 
-O Nextflow reutilizara os resultados ja calculados, economizando tempo.
+O Nextflow reutilizara os resultados já calculados, economizando tempo.
 
 ### 6.8 Executar em segundo plano
 
 Para execucoes longas, usar `screen` ou `nohup`:
 
 ```bash
-# Opcao 1: com nohup
+# Opção 1: com nohup
 nohup nextflow run nf-core/rnaseq \
     -profile docker \
     -params-file params.yaml \
     > log_rnaseq.txt 2>&1 &
 
-# Opcao 2: com screen
+# Opção 2: com screen
 screen -S rnaseq
 nextflow run nf-core/rnaseq \
     -profile docker \
@@ -498,9 +498,9 @@ nextflow run nf-core/rnaseq \
 
 ---
 
-## Etapa 7 - Interpretacao dos Resultados
+## Etapa 7 - Interpretação dos Resultados
 
-Apos a execucao bem-sucedida, os resultados estarao no diretorio especificado em `--outdir`.
+Após a execução bem-sucedida, os resultados estarão no diretório especificado em `--outdir`.
 
 ### 7.1 Estrutura dos resultados
 
@@ -509,10 +509,10 @@ results/
 ├── fastqc/                   # Relatorios de qualidade dos reads brutos
 │   ├── amostra1_R1_fastqc.html
 │   └── ...
-├── trimgalore/               # Reads apos trimagem
+├── trimgalore/               # Reads após trimagem
 │   ├── amostra1_R1_trimmed.fastq.gz
 │   └── ...
-├── star_salmon/              # Resultados do alinhamento e quantificacao
+├── star_salmon/              # Resultados do alinhamento e quantificação
 │   ├── amostra1/
 │   │   ├── amostra1.markdup.sorted.bam   # Alinhamento (BAM)
 │   │   └── amostra1.markdup.sorted.bam.bai
@@ -521,24 +521,24 @@ results/
 │   └── salmon.merged.gene_counts.tsv     # **Matriz de contagem de genes**
 │   └── salmon.merged.gene_tpm.tsv        # Valores TPM
 │   └── salmon.merged.gene_counts_length_scaled.tsv
-├── multiqc/                  # Relatorio consolidado
+├── multiqc/                  # Relatório consolidado
 │   └── multiqc_report.html   # Abrir no navegador
-└── pipeline_info/            # Informacoes sobre a execucao
+└── pipeline_info/            # Informacoes sobre a execução
     └── execution_report.html
 ```
 
 ### 7.2 Arquivos mais importantes
 
-| Arquivo | Descricao | Uso |
+| Arquivo | Descrição | Uso |
 |---------|-----------|-----|
-| `multiqc/multiqc_report.html` | Relatorio completo de QC | Avaliar qualidade geral das amostras |
-| `star_salmon/salmon.merged.gene_counts.tsv` | Matriz de contagem de genes (raw counts) | Entrada para analise diferencial |
-| `star_salmon/salmon.merged.gene_tpm.tsv` | Valores TPM normalizados | Visualizacao e comparacoes |
-| `star_salmon/salmon.merged.gene_counts_length_scaled.tsv` | Contagens corrigidas por comprimento | Alternativa para analise diferencial |
+| `multiqc/multiqc_report.html` | Relatório completo de QC | Avaliar qualidade geral das amostras |
+| `star_salmon/salmon.merged.gene_counts.tsv` | Matriz de contagem de genes (raw counts) | Entrada para análise diferencial |
+| `star_salmon/salmon.merged.gene_tpm.tsv` | Valores TPM normalizados | Visualizacao e comparações |
+| `star_salmon/salmon.merged.gene_counts_length_scaled.tsv` | Contagens corrigidas por comprimento | Alternativa para análise diferencial |
 
 ### 7.3 Verificacao de qualidade
 
-Abrir o relatorio MultiQC no navegador:
+Abrir o relatório MultiQC no navegador:
 
 ```bash
 # Linux
@@ -550,25 +550,25 @@ open results/multiqc/multiqc_report.html
 
 Pontos a verificar no relatorio:
 
-- **FastQC:** qualidade dos reads (Phred score > 20 na maioria das posicoes).
-- **Trimming:** percentual de reads retidos apos trimagem (idealmente > 90%).
+- **FastQC:** qualidade dos reads (Phred score > 20 na maioria das posições).
+- **Trimming:** percentual de reads retidos após trimagem (idealmente > 90%).
 - **Alinhamento:** taxa de mapeamento (idealmente > 70% para eucariotos).
 - **Contagem de genes:** distribuicao das contagens entre amostras.
 - **PCA / Correlacao:** amostras do mesmo grupo devem agrupar juntas.
 
 ---
 
-## Etapa 8 - Analise de Expressao Diferencial (DEGs)
+## Etapa 8 - Análise de Expressão Diferencial (DEGs)
 
-Apos obter as matrizes de contagem do pipeline nf-core/rnaseq, existem duas abordagens para realizar a analise de expressao diferencial.
+Após obter as matrizes de contagem do pipeline nf-core/rnaseq, existem duas abordagens para realizar a análise de expressão diferencial.
 
 ### Abordagem A: Usando o pipeline nf-core/differentialabundance
 
-O nf-core oferece um pipeline dedicado para analise diferencial que aceita diretamente as saidas do nf-core/rnaseq.
+O nf-core oferece um pipeline dedicado para análise diferencial que aceita diretamente as saidas do nf-core/rnaseq.
 
-#### A.1 Preparar o samplesheet para analise diferencial
+#### A.1 Preparar o samplesheet para análise diferencial
 
-Criar o arquivo `samplesheet_diff.csv` com informacoes sobre as condicoes experimentais:
+Criar o arquivo `samplesheet_diff.csv` com informações sobre as condições experimentais:
 
 ```csv
 sample,condition
@@ -582,7 +582,7 @@ TRATAMENTO_REP3,tratamento
 
 #### A.2 Preparar o arquivo de contrastes
 
-Criar o arquivo `contrasts.csv` especificando quais comparacoes realizar:
+Criar o arquivo `contrasts.csv` especificando quais comparações realizar:
 
 ```csv
 id,variable,reference,target
@@ -590,8 +590,8 @@ tratamento_vs_controle,condition,controle,tratamento
 ```
 
 - `id`: nome do contraste (descritivo).
-- `variable`: nome da coluna no samplesheet que contem os grupos.
-- `reference`: grupo de referencia (denominador no fold change).
+- `variable`: nome da coluna no samplesheet que contém os grupos.
+- `reference`: grupo de referência (denominador no fold change).
 - `target`: grupo de interesse (numerador no fold change).
 
 #### A.3 Executar o pipeline differentialabundance
@@ -608,9 +608,9 @@ nextflow run nf-core/differentialabundance \
 
 ### Abordagem B: Usando R com DESeq2 (manual)
 
-Para maior controle sobre a analise, usar DESeq2 diretamente em R.
+Para maior controle sobre a análise, usar DESeq2 diretamente em R.
 
-#### B.1 Instalar dependencias no R
+#### B.1 Instalar dependências no R
 
 ```r
 if (!require("BiocManager", quietly = TRUE))
@@ -620,13 +620,13 @@ BiocManager::install(c("DESeq2", "tximport", "AnnotationDbi"))
 install.packages(c("readr", "dplyr", "ggplot2", "pheatmap"))
 ```
 
-#### B.2 Script completo de analise com DESeq2
+#### B.2 Script completo de análise com DESeq2
 
 Criar o arquivo `scripts/deseq2_analysis.R`:
 
 ```r
 # ============================================================
-# Analise de Expressao Diferencial com DESeq2
+# Análise de Expressão Diferencial com DESeq2
 # Entrada: matrizes de contagem do nf-core/rnaseq
 # ============================================================
 
@@ -642,10 +642,10 @@ library(pheatmap)
 counts_file <- "results/star_salmon/salmon.merged.gene_counts.tsv"
 counts_raw <- read_tsv(counts_file)
 
-# A primeira coluna e o gene_id e a segunda e gene_name
+# A primeira coluna é o gene_id e a segunda é gene_name
 gene_info <- counts_raw[, c("gene_id", "gene_name")]
 
-# Montar a matriz de contagem (somente colunas numericas)
+# Montar a matriz de contagem (somente colunas numéricas)
 count_matrix <- as.matrix(counts_raw[, -c(1, 2)])
 rownames(count_matrix) <- counts_raw$gene_id
 
@@ -653,7 +653,7 @@ rownames(count_matrix) <- counts_raw$gene_id
 count_matrix <- round(count_matrix)
 
 # --------------------------------------------------
-# 2. Definir as condicoes experimentais
+# 2. Definir as condições experimentais
 # --------------------------------------------------
 # Ajustar conforme os nomes das suas colunas no arquivo de contagem
 sample_names <- colnames(count_matrix)
@@ -666,7 +666,7 @@ col_data <- data.frame(
 )
 
 # --------------------------------------------------
-# 3. Criar o objeto DESeq2 e executar a analise
+# 3. Criar o objeto DESeq2 e executar a análise
 # --------------------------------------------------
 dds <- DESeqDataSetFromMatrix(
     countData = count_matrix,
@@ -678,7 +678,7 @@ dds <- DESeqDataSetFromMatrix(
 keep <- rowSums(counts(dds)) >= 10
 dds <- dds[keep, ]
 
-# Executar a analise diferencial
+# Executar a análise diferencial
 dds <- DESeq(dds)
 
 # Extrair os resultados
@@ -688,7 +688,7 @@ res <- res[order(res$padj), ]
 # --------------------------------------------------
 # 4. Filtrar DEGs significativos
 # --------------------------------------------------
-# Criterios padrao: |log2FoldChange| > 1 e padj < 0.05
+# Critérios padrão: |log2FoldChange| > 1 e padj < 0.05
 degs <- as.data.frame(res) %>%
     filter(!is.na(padj)) %>%
     filter(padj < 0.05 & abs(log2FoldChange) > 1)
@@ -730,7 +730,7 @@ write.csv(
 )
 
 # --------------------------------------------------
-# 6. Visualizacoes
+# 6. Visualizações
 # --------------------------------------------------
 # Volcano plot
 pdf("results/degs/volcano_plot.pdf", width = 10, height = 8)
@@ -781,7 +781,7 @@ if (nrow(degs) > 0) {
     dev.off()
 }
 
-cat("\nAnalise concluida. Resultados salvos em results/degs/\n")
+cat("\nAnálise concluída. Resultados salvos em results/degs/\n")
 ```
 
 #### B.3 Executar o script
@@ -792,32 +792,32 @@ Rscript scripts/deseq2_analysis.R
 
 ---
 
-## Resolucao de Problemas
+## Resolução de Problemas
 
-### Docker nao inicia
+### Docker não inicia
 
 ```bash
-# Linux: verificar o servico
+# Linux: verificar o serviço
 sudo systemctl status docker
 sudo systemctl start docker
 
 # macOS/Windows: abrir o aplicativo Docker Desktop manualmente
 ```
 
-### Erro de permissao com Docker
+### Erro de permissão com Docker
 
 ```bash
-# Verificar se o usuario esta no grupo docker
+# Verificar se o usuárioestá no grupo docker
 groups $USER
 
-# Se nao estiver, adicionar
+# Se não estiver, adicionar
 sudo usermod -aG docker $USER
 # Fazer logout e login novamente
 ```
 
-### Pipeline falha por falta de memoria
+### Pipeline falha por falta de memória
 
-Aumentar a memoria disponivel para o Docker (Docker Desktop > Settings > Resources) ou usar o parametro `--max_memory`:
+Aumentar a memória disponível para o Docker (Docker Desktop > Settings > Resources) ou usar o parâmetro `--max_memory`:
 
 ```bash
 nextflow run nf-core/rnaseq \
@@ -830,10 +830,10 @@ nextflow run nf-core/rnaseq \
 ### Erro "No space left on device"
 
 ```bash
-# Limpar containers e imagens Docker nao utilizados
+# Limpar containers e imagens Docker não utilizados
 docker system prune -a
 
-# Verificar o espaco em disco
+# Verificar o espaço em disco
 df -h
 ```
 
@@ -847,19 +847,19 @@ nextflow run nf-core/rnaseq \
     -resume
 ```
 
-### Limpar arquivos temporarios apos a execucao
+### Limpar arquivos temporários após a execução
 
 ```bash
-# O diretorio work/ pode ocupar muito espaco. Remover apos confirmar os resultados:
+# O diretório work/ pode ocupar muito espaco. Remover após confirmar os resultados:
 rm -rf work/
 
-# Manter os logs do Nextflow para referencia:
+# Manter os logs do Nextflow para referência:
 # .nextflow.log
 ```
 
 ---
 
-## Referencias
+## Referências
 
 - **nf-core/rnaseq:** https://nf-co.re/rnaseq
 - **nf-core/differentialabundance:** https://nf-co.re/differentialabundance
@@ -872,6 +872,6 @@ rm -rf work/
 
 ---
 
-## Licenca
+## Licença
 
-Este protocolo e disponibilizado sob a licenca MIT.
+Este protocolo é disponibilizado sob a licença MIT.
