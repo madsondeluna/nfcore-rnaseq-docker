@@ -197,32 +197,6 @@ nextflow run nf-core/rnaseq \
 
 ---
 
-### Fluxo geral simplificado
-
-```mermaid
-flowchart LR
-    A["FASTQ brutos"] --> B["Controle de<br>Qualidade<br>FastQC"]
-    B --> C["Trimagem<br>Trim Galore"]
-    C --> D["Alinhamento<br>STAR / HISAT2"]
-    D --> E["Quantificação<br>Salmon"]
-    E --> F["Relatório<br>MultiQC"]
-    F --> G["Matrizes de<br>Contagem"]
-    G --> H["Análise Diferencial<br>DESeq2 / edgeR"]
-    H --> I["Lista de DEGs"]
-
-    style A fill:#4a6fa5,stroke:#2d4a7a,color:#ffffff
-    style B fill:#6b8cae,stroke:#4a6fa5,color:#ffffff
-    style C fill:#6b8cae,stroke:#4a6fa5,color:#ffffff
-    style D fill:#6b8cae,stroke:#4a6fa5,color:#ffffff
-    style E fill:#6b8cae,stroke:#4a6fa5,color:#ffffff
-    style F fill:#6b8cae,stroke:#4a6fa5,color:#ffffff
-    style G fill:#e8c547,stroke:#c4a432,color:#333333
-    style H fill:#d4763a,stroke:#b35e28,color:#ffffff
-    style I fill:#4caf50,stroke:#388e3c,color:#ffffff
-```
-
----
-
 ## RNA-Seq *de novo* vs. RNA-Seq com genoma de referência
 
 Antes de executar o pipeline, é fundamental entender as duas estratégias principais de análise de RNA-Seq, pois a escolha impacta diretamente nos resultados, na precisão e nos recursos computacionais necessários.
