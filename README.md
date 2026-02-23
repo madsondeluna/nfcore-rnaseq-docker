@@ -472,43 +472,50 @@ TRATAMENTO_REP2,/caminho/completo/data/raw_fastq/TREAT_2.fastq.gz,,auto
 
 ## Etapa 5 - Obtenção do Genoma de Referência
 
-O pipeline precisa de um genoma de referência (FASTA) e de uma anotação (GTF) para realizar o alinhamento e a quantificação.
+O pipeline precisa de um genoma de referência (FASTA) e de uma anotação (GTF/GFF) para realizar o alinhamento e a quantificação. Neste protocolo, utilizamos o genoma de **Vigna unguiculata** (feijão-caupi), disponível no [Phytozome v14](https://phytozome-next.jgi.doe.gov/).
 
-### 5.1 Fontes comuns de genomas
+### 5.1 Fonte do genoma
 
-| Organismo | Fonte | URL |
-|-----------|-------|-----|
-| Humano (GRCh38) | Ensembl | https://www.ensembl.org/Homo_sapiens/Info/Index |
-| Camundongo (GRCm39) | Ensembl | https://www.ensembl.org/Mus_musculus/Info/Index |
-| Arabidopsis | Ensembl Plants | https://plants.ensembl.org/Arabidopsis_thaliana/Info/Index |
-| Outros | NCBI | https://www.ncbi.nlm.nih.gov/datasets/genome/ |
+| Organismo | Versão | Fonte | URL |
+|-----------|--------|-------|-----|
+| *Vigna unguiculata* (feijão-caupi) | v1.2 (IT97K-499-35) | Phytozome v14 | https://phytozome-next.jgi.doe.gov/info/Vunguiculata_v1_2 |
 
-### 5.2 Exemplo: Baixar genoma humano (Ensembl)
+### 5.2 Como baixar o genoma do Phytozome
+
+O Phytozome exige login (gratuito) para download dos dados. Siga os passos abaixo:
+
+1. Criar uma conta gratuita em https://phytozome-next.jgi.doe.gov/ (caso ainda não possua).
+2. Acessar a página de *Vigna unguiculata*: https://phytozome-next.jgi.doe.gov/info/Vunguiculata_v1_2
+3. Clicar em **Download** e baixar os seguintes arquivos:
+
+| Arquivo | Descrição | Nome esperado |
+|---------|-----------|---------------|
+| Genoma FASTA | Sequências dos cromossomos/scaffolds | `Vunguiculata_469_v1.0.fa.gz` |
+| Anotação GFF3 | Coordenadas dos genes e transcritos | `Vunguiculata_469_v1.2.gene.gff3.gz` |
+
+4. Mover os arquivos para o diretório de referência e descompactar:
 
 ```bash
 cd data/reference/
 
-# Baixar o genoma FASTA (primary assembly)
-wget https://ftp.ensembl.org/pub/release-112/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
-gunzip Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+# Descompactar o genoma FASTA
+gunzip Vunguiculata_469_v1.0.fa.gz
 
-# Baixar a anotação GTF
-wget https://ftp.ensembl.org/pub/release-112/gtf/homo_sapiens/Homo_sapiens.GRCh38.112.gtf.gz
-gunzip Homo_sapiens.GRCh38.112.gtf.gz
+# Descompactar a anotação GFF3
+gunzip Vunguiculata_469_v1.2.gene.gff3.gz
 
 cd ../..
 ```
 
+> **Nota:** O Phytozome fornece anotação no formato GFF3. O pipeline nf-core/rnaseq aceita tanto GTF quanto GFF3 através do parâmetro `--gff` (em vez de `--gtf`). Se preferir converter para GTF, utilize o [gffread](https://github.com/gpertea/gffread):
+>
+> ```bash
+> gffread Vunguiculata_469_v1.2.gene.gff3 -T -o Vunguiculata_469_v1.2.gtf
+> ```
+
 ### 5.3 Usar genomas pré-configurados do iGenomes (alternativa)
 
-O pipeline suporta genomas pré-configurados do iGenomes através do parâmetro `--genome`. No entanto, essa abordagem **não é recomendada** pela equipe do nf-core, pois os genomas podem estar desatualizados.
-
-```bash
-# Exemplo (nao recomendado)
---genome GRCh38
-```
-
-A abordagem recomendada é fornecer os arquivos explicitamente com `--fasta` e `--gtf`.
+O pipeline suporta genomas pré-configurados do iGenomes através do parâmetro `--genome`. No entanto, *Vigna unguiculata* **não está disponível** no iGenomes, portanto é necessário fornecer os arquivos manualmente com `--fasta` e `--gff` (ou `--gtf`).
 
 ---
 
@@ -544,8 +551,8 @@ Este teste usa um pequeno conjunto de dados incluído no pipeline. Se finalizar 
 nextflow run nf-core/rnaseq \
     --input samplesheet.csv \
     --outdir results \
-    --fasta data/reference/Homo_sapiens.GRCh38.dna.primary_assembly.fa \
-    --gtf data/reference/Homo_sapiens.GRCh38.112.gtf \
+    --fasta data/reference/Vunguiculata_469_v1.0.fa \
+    --gff data/reference/Vunguiculata_469_v1.2.gene.gff3 \
     -profile docker
 ```
 
@@ -610,8 +617,8 @@ Para reprodutibilidade, salvar todos os parâmetros em um arquivo `params.yaml`:
 ```yaml
 input: 'samplesheet.csv'
 outdir: 'results'
-fasta: 'data/reference/Homo_sapiens.GRCh38.dna.primary_assembly.fa'
-gtf: 'data/reference/Homo_sapiens.GRCh38.112.gtf'
+fasta: 'data/reference/Vunguiculata_469_v1.0.fa'
+gff: 'data/reference/Vunguiculata_469_v1.2.gene.gff3'
 aligner: 'star_salmon'
 ```
 
@@ -761,7 +768,7 @@ nextflow run nf-core/differentialabundance \
     --input samplesheet_diff.csv \
     --contrasts contrasts.csv \
     --matrix results/star_salmon/salmon.merged.gene_counts_length_scaled.tsv \
-    --gtf data/reference/Homo_sapiens.GRCh38.112.gtf \
+    --gff data/reference/Vunguiculata_469_v1.2.gene.gff3 \
     --outdir results/degs \
     -profile docker
 ```
