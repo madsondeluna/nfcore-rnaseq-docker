@@ -38,32 +38,26 @@ O pipeline executa as seguintes etapas automaticamente:
 
 ### Fluxo geral
 
-```
-FASTQ brutos
-    |
-    v
-[Controle de Qualidade - FastQC]
-    |
-    v
-[Trimagem - Trim Galore]
-    |
-    v
-[Alinhamento - STAR/HISAT2]
-    |
-    v
-[Quantificacao - Salmon/featureCounts]
-    |
-    v
-[Relatorio - MultiQC]
-    |
-    v
-Matrizes de contagem
-    |
-    v
-[Analise Diferencial - DESeq2/edgeR]
-    |
-    v
-Lista de DEGs
+```mermaid
+flowchart TD
+    A["FASTQ brutos"] --> B["Controle de Qualidade\nFastQC"]
+    B --> C["Trimagem de Adaptadores\nTrim Galore / fastp"]
+    C --> D["Alinhamento\nSTAR / HISAT2"]
+    D --> E["Quantificacao\nSalmon / featureCounts"]
+    E --> F["Relatorio de Qualidade\nMultiQC"]
+    F --> G["Matrizes de Contagem"]
+    G --> H["Analise Diferencial\nDESeq2 / edgeR"]
+    H --> I["Lista de DEGs"]
+
+    style A fill:#4a6fa5,stroke:#2d4a7a,color:#ffffff
+    style B fill:#6b8cae,stroke:#4a6fa5,color:#ffffff
+    style C fill:#6b8cae,stroke:#4a6fa5,color:#ffffff
+    style D fill:#6b8cae,stroke:#4a6fa5,color:#ffffff
+    style E fill:#6b8cae,stroke:#4a6fa5,color:#ffffff
+    style F fill:#6b8cae,stroke:#4a6fa5,color:#ffffff
+    style G fill:#e8c547,stroke:#c4a432,color:#333333
+    style H fill:#d4763a,stroke:#b35e28,color:#ffffff
+    style I fill:#4caf50,stroke:#388e3c,color:#ffffff
 ```
 
 ---
