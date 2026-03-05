@@ -1,0 +1,28 @@
+# =============================================================
+# Parametros do pipeline nf-core/rnaseq
+# Dataset: Xia et al 2021 (SRP282921) - QuantSeq 3' RNA-Seq
+# Organismo: Mus musculus (camundongo), genoma GRCm38 + Gencode M17
+# =============================================================
+
+# --- AJUSTE OS CAMINHOS ABAIXO PARA O SEU COMPUTADOR ---
+
+# Arquivo de entrada (samplesheet gerado pelo nf-core/fetchngs)
+input: '/home/SEU_USUARIO/tutorial-quantseq/fastq/samplesheet/samplesheet.csv'
+
+# Diretorio de saida
+outdir: '/home/SEU_USUARIO/tutorial-quantseq/resultados_rnaseq'
+
+# Genoma de referencia
+fasta: '/home/SEU_USUARIO/tutorial-quantseq/referencia/GRCm38.primary_assembly.genome.fa'
+gtf: '/home/SEU_USUARIO/tutorial-quantseq/referencia/gencode.vM17.primary_assembly.annotation.gtf'
+
+# Alinhador (star_salmon e o padrao e recomendado)
+aligner: 'star_salmon'
+
+# Parametros especificos para QuantSeq 3' mRNA-Seq
+# Remove os primeiros 12 nucleotideos (regiao de poli-A da extremidade 3')
+extra_trimgalore_args: '--clip_r1 12'
+
+# --- RECURSOS COMPUTACIONAIS (descomente e ajuste se necessario) ---
+# max_memory: '16.GB'
+# max_cpus: 8

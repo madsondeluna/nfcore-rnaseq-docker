@@ -1,0 +1,7 @@
+sample,fastq_1,fastq_2,strandedness
+CTRL_REP1,/caminho/absoluto/para/CTRL_1.fastq.gz,,forward
+CTRL_REP2,/caminho/absoluto/para/CTRL_2.fastq.gz,,forward
+CTRL_REP3,/caminho/absoluto/para/CTRL_3.fastq.gz,,forward
+TREAT_REP1,/caminho/absoluto/para/TREAT_1.fastq.gz,,forward
+TREAT_REP2,/caminho/absoluto/para/TREAT_2.fastq.gz,,forward
+TREAT_REP3,/caminho/absoluto/para/TREAT_3.fastq.gz,,forward
