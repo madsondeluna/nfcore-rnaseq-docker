@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1169 580" width="1169" height="580" font-family="Arial, Helvetica, sans-serif">
+
+  <!-- Fundo branco -->
+  <rect width="1169" height="580" fill="white"/>
+
+  <!-- ===== TITULO ===== -->
+  <text x="580" y="48" text-anchor="middle" font-size="20" font-weight="bold" fill="#333333">
+    Por que usar Docker em bioinformatica?
+  </text>
+
+  <!-- ===== LADO ESQUERDO: SEM DOCKER ===== -->
+
+  <!-- Titulo "Sem Docker" -->
+  <text x="240" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#AE4132">Sem Docker</text>
+
+  <!-- Caixa vermelha: Seu computador -->
+  <rect x="60" y="120" width="360" height="380" fill="#f8cecc" stroke="#b85450" stroke-width="2" rx="10"/>
+
+  <!-- Label: Seu computador -->
+  <text x="240" y="144" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Seu computador</text>
+
+  <!-- Divisor horizontal abaixo do label -->
+  <line x1="60" y1="157" x2="420" y2="157" stroke="#b85450" stroke-width="1" opacity="0.4"/>
+
+  <!-- Python -->
+  <rect x="100" y="175" width="280" height="50" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5" rx="6"/>
+  <text x="240" y="205" text-anchor="middle" font-size="13" fill="#333333">Python 3.11</text>
+
+  <!-- NumPy -->
+  <rect x="100" y="245" width="280" height="50" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5" rx="6"/>
+  <text x="240" y="275" text-anchor="middle" font-size="13" fill="#333333">NumPy 1.24</text>
+
+  <!-- STAR -->
+  <rect x="100" y="315" width="280" height="50" fill="#fff2cc" stroke="#d6b656" stroke-width="1.5" rx="6"/>
+  <text x="240" y="345" text-anchor="middle" font-size="13" fill="#333333">STAR 2.7.10a</text>
+
+  <!-- Aviso de conflito -->
+  <rect x="100" y="390" width="280" height="70" fill="#f8cecc" stroke="#AE4132" stroke-width="1.5" rx="6"/>
+  <text x="240" y="414" text-anchor="middle" font-size="12" font-weight="bold" fill="#AE4132">Conflitos de versao!</text>
+  <text x="240" y="432" text-anchor="middle" font-size="11" fill="#AE4132">Dificil reproduzir em outro</text>
+  <text x="240" y="448" text-anchor="middle" font-size="11" fill="#AE4132">computador.</text>
+
+  <!-- ===== SETA CENTRAL ===== -->
+  <rect x="452" y="280" width="136" height="50" fill="#23A45A" stroke="#23A45A" stroke-width="1" rx="25"/>
+  <text x="520" y="311" text-anchor="middle" font-size="14" font-weight="bold" fill="white">Solucao &#x2192;</text>
+
+  <!-- ===== LADO DIREITO: COM DOCKER ===== -->
+
+  <!-- Titulo "Com Docker" -->
+  <text x="850" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#23A45A">Com Docker</text>
+
+  <!-- Caixa verde: Seu computador + Docker Engine -->
+  <rect x="640" y="120" width="420" height="380" fill="#d5e8d4" stroke="#82b366" stroke-width="2" rx="10"/>
+
+  <!-- Label: Seu computador + Docker Engine -->
+  <text x="850" y="144" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Seu computador + Docker Engine</text>
+
+  <!-- Divisor horizontal abaixo do label -->
+  <line x1="640" y1="157" x2="1060" y2="157" stroke="#82b366" stroke-width="1" opacity="0.4"/>
+
+  <!-- Container: FastQC -->
+  <rect x="672" y="175" width="356" height="60" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" rx="6"/>
+  <text x="850" y="197" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Container: FastQC</text>
+  <text x="850" y="218" text-anchor="middle" font-size="11" fill="#555555">Python 3.7 - todas as dependencias inclusas</text>
+
+  <!-- Container: STAR -->
+  <rect x="672" y="253" width="356" height="60" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" rx="6"/>
+  <text x="850" y="275" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Container: STAR</text>
+  <text x="850" y="296" text-anchor="middle" font-size="11" fill="#555555">STAR 2.7.9a - dependencias proprias e isoladas</text>
+
+  <!-- Container: Salmon -->
+  <rect x="672" y="331" width="356" height="60" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5" rx="6"/>
+  <text x="850" y="353" text-anchor="middle" font-size="13" font-weight="bold" fill="#333333">Container: Salmon</text>
+  <text x="850" y="374" text-anchor="middle" font-size="11" fill="#555555">Salmon 1.9 - dependencias proprias e isoladas</text>
+
+  <!-- Caixa de sucesso -->
+  <rect x="672" y="408" width="356" height="52" fill="#d5e8d4" stroke="#23A45A" stroke-width="1.5" rx="6"/>
+  <text x="850" y="429" text-anchor="middle" font-size="12" font-weight="bold" fill="#23A45A">Sem conflitos! Reprodutivel em</text>
+  <text x="850" y="447" text-anchor="middle" font-size="12" fill="#23A45A">qualquer computador com Docker.</text>
+
+  <!-- ===== RODAPE ===== -->
+  <rect x="60" y="520" width="1049" height="42" fill="#f5f5f5" stroke="#AAAAAA" stroke-width="1" rx="6"/>
+  <text x="584" y="546" text-anchor="middle" font-size="12" fill="#333333">
+    O Nextflow baixa automaticamente cada container do Docker Hub - voce nao precisa instalar STAR, Salmon, FastQC, etc.
+  </text>
+
+</svg>

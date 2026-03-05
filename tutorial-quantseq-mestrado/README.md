@@ -39,7 +39,7 @@ Tutorial completo para alunos de pós-graduação que estão aprendendo a montar
 
 ## 1. Contexto: o que é QuantSeq RNA-Seq
 
-O **QuantSeq 3' mRNA-Seq** (da empresa Lexogen) é um protocolo de sequenciamento de RNA que captura apenas a região 3' dos transcritos. Isso reduz o custo e o tempo de processamento em comparação ao RNA-Seq convencional (que captura o transcrito inteiro), mantendo a capacidade de medir expressão gênica.
+O **QuantSeq 3' mRNA-Seq** (da empresa Lexogen) é um protocolo de sequenciamento de RNA que captura apenas a região 3' dos transcritos. Isso reduz o custo e o tempo de processamento em comparação ao RNA-Seq convencional (que captura o transcrito inteiro), mantendo a capacidade de medir expressão gênica. Vale lembrar que o QuantSeq é diferente do RNA-Seq tradicional, e isso tem implicações para o processamento dos dados. Estamos usando esses dados devido ao seu tamanho reduzido e características específicas, o que torna o tutorial mais acessível.
 
 **Características importantes:**
 - Dados **single-end** (apenas uma direção de leitura, sem R2)
@@ -72,13 +72,11 @@ Esse problema de **reprodutibilidade** é um dos maiores desafios da bioinformá
 
 O Docker resolve isso criando **containers**: pacotes completos e isolados que contêm o programa, todas as suas dependências, as versões exatas das bibliotecas e até o sistema operacional mínimo necessário para rodar. É como uma "caixa fechada" que funciona identicamente em qualquer computador que tenha Docker instalado.
 
-![Diagrama Docker](docker-conceito.drawio)
-
-> Abra o arquivo [docker-conceito.drawio](docker-conceito.drawio) em [diagrams.net](https://app.diagrams.net/) para visualizar o diagrama interativo.
+![Diagrama Docker](tutorial-quantseq-mestrado/docker-conceito.svg)
 
 ### Por que o nf-core usa Docker
 
-O pipeline nf-core/rnaseq usa **dezenas de ferramentas diferentes** (STAR, Salmon, FastQC, Trim Galore, MultiQC, etc.). Em vez de você instalar cada uma manualmente (o que levaria horas e geraria conflitos de versão), o Nextflow baixa automaticamente os containers Docker de cada ferramenta quando necessário.
+O pipeline nf-core/rnaseq usa **dezenas de ferramentas diferentes** (STAR, Salmon, FastQC, Trim Galore, MultiQC, etc.). Em vez de você instalar cada uma manualmente (o que levaria horas e geraria conflitos de versão), o Nextflow baixa automaticamente os containers Docker de cada ferramenta quando necessário. 
 
 Você só precisa ter o Docker instalado. O resto é automático.
 
