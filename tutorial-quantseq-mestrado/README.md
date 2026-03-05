@@ -4,14 +4,16 @@ Tutorial completo para alunos de pós-graduação que estão aprendendo a montar
 
 > Este tutorial é baseado no artigo: [QuantSeq RNAseq com nf-core (Thomas Singer, 2023)](https://tomsing1.github.io/blog/posts/nextflow-core-quantseq-1-settings/)
 
+**Sistema utilizado neste tutorial:** Ubuntu Linux, processador Intel (x86_64)
+
 ---
 
 ## O que você vai aprender
 
 1. O que é Docker e por que ele é essencial para bioinformática reprodutível
-2. Como instalar o Docker Desktop e usar o Docker pelo terminal
-3. Como instalar o Nextflow e as ferramentas nf-core
-4. Como verificar se tudo está funcionando corretamente
+2. Como instalar o Docker Engine no Ubuntu
+3. Como instalar o Nextflow
+4. Como verificar se tudo está funcionando
 5. Como baixar os dados de sequenciamento públicos (FASTQs do SRA)
 6. Como montar o samplesheet e configurar o pipeline
 7. Como executar o pipeline nf-core/rnaseq com Docker
@@ -23,14 +25,14 @@ Tutorial completo para alunos de pós-graduação que estão aprendendo a montar
 
 1. [Contexto: o que é QuantSeq RNA-Seq](#1-contexto-o-que-é-quantseq-rna-seq)
 2. [Por que usar Docker em bioinformática](#2-por-que-usar-docker-em-bioinformática)
-3. [Parte 1 - Instalando o Docker](#parte-1---instalando-o-docker)
-4. [Parte 2 - Instalando o Nextflow](#parte-2---instalando-o-nextflow)
-5. [Parte 3 - Instalando as ferramentas nf-core](#parte-3---instalando-as-ferramentas-nf-core)
-6. [Parte 4 - Verificando se tudo está funcionando](#parte-4---verificando-se-tudo-está-funcionando)
-7. [Parte 5 - Baixando os dados do tutorial (SRA)](#parte-5---baixando-os-dados-do-tutorial-sra)
-8. [Parte 6 - Preparando o samplesheet](#parte-6---preparando-o-samplesheet)
-9. [Parte 7 - Executando o pipeline nf-core/rnaseq](#parte-7---executando-o-pipeline-nf-corernaseq)
-10. [Parte 8 - Entendendo os resultados](#parte-8---entendendo-os-resultados)
+3. [O que você precisa instalar -e o que não precisa](#3-o-que-você-precisa-instalar--e-o-que-não-precisa)
+4. [Parte 1 - Instalando o Docker Engine no Ubuntu](#parte-1---instalando-o-docker-engine-no-ubuntu)
+5. [Parte 2 - Instalando o Nextflow](#parte-2---instalando-o-nextflow)
+6. [Parte 3 - Verificando se tudo está funcionando](#parte-3---verificando-se-tudo-está-funcionando)
+7. [Parte 4 - Baixando os dados do tutorial (SRA)](#parte-4---baixando-os-dados-do-tutorial-sra)
+8. [Parte 5 - Preparando o samplesheet](#parte-5---preparando-o-samplesheet)
+9. [Parte 6 - Executando o pipeline nf-core/rnaseq](#parte-6---executando-o-pipeline-nf-corernaseq)
+10. [Parte 7 - Entendendo os resultados](#parte-7---entendendo-os-resultados)
 11. [Solução de problemas comuns](#solução-de-problemas-comuns)
 
 ---
@@ -62,7 +64,7 @@ Nós vamos baixar e processar o dataset **Xia et al (SRP282921)**, que é o mais
 
 ### O problema que o Docker resolve
 
-Imagine que você instala um programa de bioinformática hoje e ele funciona perfeitamente. Daqui a um ano, um colega tenta reproduzir sua análise no computador dele - mas o programa não funciona, porque a versão do Python é diferente, ou uma biblioteca foi atualizada, ou o sistema operacional é outro.
+Imagine que você instala um programa de bioinformática hoje e ele funciona perfeitamente. Daqui a um ano, um colega tenta reproduzir sua análise no computador dele -mas o programa não funciona, porque a versão do Python é diferente, ou uma biblioteca foi atualizada, ou o sistema operacional é outro.
 
 Esse problema de **reprodutibilidade** é um dos maiores desafios da bioinformática moderna.
 
@@ -70,19 +72,9 @@ Esse problema de **reprodutibilidade** é um dos maiores desafios da bioinformá
 
 O Docker resolve isso criando **containers**: pacotes completos e isolados que contêm o programa, todas as suas dependências, as versões exatas das bibliotecas e até o sistema operacional mínimo necessário para rodar. É como uma "caixa fechada" que funciona identicamente em qualquer computador que tenha Docker instalado.
 
-```
-Sem Docker:                  Com Docker:
-+-----------------+          +---------------------------+
-| Seu computador  |          | Container Docker          |
-| Python 3.11     |  ====>   | Python 3.9                |
-| NumPy 1.24      |          | NumPy 1.21                |
-| STAR 2.7.10a    |          | STAR 2.7.9a               |
-| ...             |          | TUDO que o programa precisa|
-+-----------------+          +---------------------------+
-                             | Funciona igual em qualquer|
-                             | computador com Docker!    |
-                             +---------------------------+
-```
+![Diagrama Docker](docker-conceito.drawio)
+
+> Abra o arquivo [docker-conceito.drawio](docker-conceito.drawio) em [diagrams.net](https://app.diagrams.net/) para visualizar o diagrama interativo.
 
 ### Por que o nf-core usa Docker
 
@@ -92,172 +84,132 @@ Você só precisa ter o Docker instalado. O resto é automático.
 
 ---
 
-## Parte 1 - Instalando o Docker
+## 3. O que você precisa instalar -e o que não precisa
 
-### Opção A: Docker Desktop (recomendado para iniciantes)
+Esta é uma das maiores vantagens de usar Docker com nf-core: a lista do que você realmente precisa instalar na sua máquina é mínima.
 
-O **Docker Desktop** é uma aplicação gráfica com interface visual que instala tudo automaticamente. É a forma mais fácil de começar.
+### Precisa instalar (3 coisas apenas):
 
-#### macOS (Apple Silicon M1/M2/M3 ou Intel)
+| Software | Por quê precisa estar na máquina |
+|----------|----------------------------------|
+| **Docker Engine** | É o motor que cria e executa os containers |
+| **Java** | O Nextflow é escrito em Java e precisa dele para iniciar |
+| **Nextflow** | É quem lê o pipeline e orquestra a execução dos containers |
 
-1. Acesse: https://www.docker.com/products/docker-desktop/
-2. Clique em **"Download Docker Desktop"**
-3. Escolha a versão correta:
-   - **Apple Silicon** se seu Mac tem chip M1, M2 ou M3
-   - **Intel** se seu Mac tem processador Intel (Macs mais antigos)
-4. Abra o arquivo `.dmg` baixado
-5. Arraste o ícone do Docker para a pasta **Applications**
-6. Abra o Docker Desktop pelo Launchpad ou pela pasta Applications
-7. Aguarde a inicialização (um ícone de baleia aparecerá na barra de menu no topo da tela)
-8. Quando a baleia parar de se mover, o Docker está pronto
+### NÃO precisa instalar:
 
-**Como verificar se o Mac é Apple Silicon ou Intel:**
+- STAR, Salmon, HISAT2 -rodam dentro de containers Docker
+- FastQC, Trim Galore, MultiQC -idem
+- Python, R, Perl -as versões corretas já estão dentro dos containers
+- nf-core tools -opcional, usaremos apenas para baixar os dados
+
+O Nextflow baixa cada container automaticamente na primeira vez que o processo correspondente é executado e os armazena em cache para execuções futuras.
+
+---
+
+## Parte 1 - Instalando o Docker Engine no Ubuntu
+
+O **Docker Engine** é a versão de linha de comando do Docker, ideal para Linux. Não é necessário instalar o Docker Desktop (que é uma interface gráfica voltada para macOS e Windows).
+
+### 1.1 Remover versões antigas (se houver)
+
 ```bash
-# Abra o Terminal e execute:
-uname -m
-
-# Se aparecer "arm64" => Apple Silicon (M1/M2/M3)
-# Se aparecer "x86_64" => Intel
+sudo apt-get remove docker docker-engine docker.io containerd runc
 ```
 
-#### Windows 10/11
+Esse comando remove instalações anteriores do Docker para evitar conflitos. Não se preocupe se aparecer a mensagem "package not found" -significa que não havia versão antiga instalada.
 
-1. Acesse: https://www.docker.com/products/docker-desktop/
-2. Baixe o instalador para Windows
-3. Execute o instalador `.exe`
-4. **IMPORTANTE:** durante a instalação, aceite a opção de habilitar o **WSL 2** (Windows Subsystem for Linux)
-   - O WSL 2 é necessário para que o Docker funcione bem no Windows
-   - Se solicitado, siga as instruções para instalar o WSL 2 pelo Windows Update
-5. Reinicie o computador se solicitado
-6. Abra o Docker Desktop pelo menu Iniciar
-7. Aguarde a inicialização completa
-
-#### Linux (Ubuntu/Debian)
-
-No Linux, o Docker Desktop também está disponível, mas muitos usuários preferem instalar apenas o motor Docker (Docker Engine) pelo terminal:
+### 1.2 Instalar o Docker Engine
 
 ```bash
-# 1. Remover versões antigas (se houver)
-sudo apt-get remove docker docker-engine docker.io containerd runc
-
-# 2. Atualizar os pacotes do sistema
+# Atualizar a lista de pacotes
 sudo apt-get update
 
-# 3. Instalar dependências necessárias
+# Instalar dependências necessárias para o próximo passo
 sudo apt-get install -y \
     ca-certificates \
     curl \
     gnupg \
     lsb-release
+```
 
-# 4. Adicionar a chave GPG oficial do Docker
-# (garante que o software vem da fonte oficial)
+Esses pacotes permitem que o sistema baixe software de fontes HTTPS e verifique assinaturas digitais.
+
+```bash
+# Adicionar a chave GPG oficial do Docker
+# Isso garante que o software baixado vem realmente do Docker Inc.
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
     sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+```
 
-# 5. Adicionar o repositório oficial do Docker
+```bash
+# Registrar o repositório oficial do Docker como fonte de pacotes
 echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] \
   https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
 
-# 6. Instalar o Docker Engine
+Note que usamos `arch=amd64` porque o processador é Intel (x86_64). Se fosse ARM, seria `arch=arm64`.
+
+```bash
+# Instalar o Docker Engine
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ```
 
-**Por que cada passo:** os passos 1-3 preparam o sistema, o passo 4 adiciona a chave de segurança do Docker (evita instalar software modificado/malicioso), o passo 5 registra o repositório oficial, e o passo 6 instala o Docker Engine de fato.
+### 1.3 Permitir usar Docker sem sudo
 
-**Configuração pós-instalação no Linux** (importante para não precisar de `sudo` toda hora):
+Por padrão no Linux, o Docker exige permissões de administrador (`sudo`) a cada comando. Para simplificar:
 
 ```bash
 # Adicionar seu usuário ao grupo docker
-# Isso permite rodar comandos docker sem sudo
 sudo usermod -aG docker $USER
 
-# Aplicar a mudança sem precisar fazer logout
+# Aplicar a mudança na sessão atual sem precisar fazer logout
 newgrp docker
+```
 
-# Iniciar o serviço Docker automaticamente ao ligar o computador
-sudo systemctl enable docker
+**Por que isso é necessário:** o Docker comunica com um processo em segundo plano (o "daemon") através de um socket que por padrão só aceita conexões do root. Ao adicionar seu usuário ao grupo `docker`, você ganha permissão para se comunicar com esse socket diretamente.
+
+### 1.4 Iniciar o Docker e configurar para iniciar automaticamente
+
+```bash
+# Iniciar o Docker agora
 sudo systemctl start docker
-```
 
----
+# Configurar para iniciar automaticamente ao ligar o computador
+sudo systemctl enable docker
 
-### Opção B: Docker via terminal (linha de comando pura)
-
-Se você usa macOS e prefere instalar pelo terminal, pode usar o **Homebrew**:
-
-```bash
-# Instalar o Homebrew primeiro (se não tiver)
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Instalar o Docker Desktop via Homebrew Cask
-brew install --cask docker
-
-# Abrir o Docker Desktop para inicializar
-open /Applications/Docker.app
-```
-
----
-
-### Como ativar/iniciar o Docker
-
-O Docker precisa estar **em execução** para o Nextflow conseguir criar containers. Veja como verificar e iniciar:
-
-**macOS e Windows:**
-- Abra o aplicativo **Docker Desktop** pela pasta Applications (macOS) ou menu Iniciar (Windows)
-- Aguarde o ícone da baleia na barra de menu ficar estável (para de se mover)
-- O Docker está pronto quando você vê "Docker Desktop is running" no painel do aplicativo
-
-**Linux:**
-```bash
-# Verificar o status do Docker
+# Verificar se está rodando
 sudo systemctl status docker
-
-# Se estiver parado, iniciar
-sudo systemctl start docker
-
-# Para iniciar automaticamente ao ligar o computador
-sudo systemctl enable docker
 ```
+
+Você deve ver `Active: active (running)` na saída do último comando.
 
 ---
 
 ## Parte 2 - Instalando o Nextflow
 
-O **Nextflow** é o motor de workflow que orquestra a execução do pipeline. Ele é quem lê as instruções do nf-core/rnaseq, baixa os containers Docker de cada ferramenta e executa tudo na ordem correta.
+O **Nextflow** é o motor de workflow que orquestra a execução do pipeline. Ele lê as instruções do nf-core/rnaseq, baixa os containers Docker de cada ferramenta e executa tudo na ordem correta.
 
-### 2.1 Verificar se o Java está instalado
+O Nextflow em si roda diretamente na sua máquina (não dentro de um container), por isso precisa ser instalado localmente junto com o Java.
 
-O Nextflow precisa do Java para funcionar. Verifique:
+### 2.1 Instalar o Java
 
 ```bash
+# Instalar o Java Development Kit (versão 17 recomendada)
+sudo apt-get install -y default-jdk
+
+# Verificar a instalação
 java -version
 ```
 
-**O que você deve ver (algo parecido com):**
+Você deve ver algo como:
 ```
-openjdk version "17.0.9" 2023-10-17
-OpenJDK Runtime Environment Temurin-17.0.9+9 (build 17.0.9+9)
-OpenJDK Server VM Temurin-17.0.9+9 (build 17.0.9+9, mixed mode)
-```
-
-Se o Java não estiver instalado ou for anterior à versão 11, instale:
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install -y default-jdk
-
-# macOS com Homebrew
-brew install openjdk@17
-
-# Após instalar no macOS, adicionar ao PATH:
-echo 'export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+openjdk version "17.0.x" ...
 ```
 
 ### 2.2 Instalar o Nextflow
@@ -266,10 +218,8 @@ source ~/.zshrc
 # Baixar o instalador do Nextflow
 curl -s https://get.nextflow.io | bash
 
-# O comando acima cria um arquivo executável chamado "nextflow"
-# no diretório atual. Mova para um local acessível em todo o sistema:
-
-# macOS/Linux:
+# O comando acima cria um arquivo executável "nextflow" no diretório atual
+# Mover para /usr/local/bin/ para poder usá-lo de qualquer pasta
 chmod +x nextflow
 sudo mv nextflow /usr/local/bin/
 
@@ -277,98 +227,49 @@ sudo mv nextflow /usr/local/bin/
 nextflow -version
 ```
 
-**O que você deve ver:**
+Você deve ver algo como:
 ```
       N E X T F L O W
       version 24.x.x build ...
-      created ...
-      cite doi:10.1038/nbt.3820
       http://nextflow.io
 ```
 
-**Por que mover para `/usr/local/bin/`:** esse diretório é automaticamente incluído no PATH do sistema, o que permite você chamar `nextflow` de qualquer pasta, sem precisar escrever o caminho completo.
+**Por que mover para `/usr/local/bin/`:** esse diretório está incluído no PATH do sistema, o que permite chamar `nextflow` de qualquer pasta sem precisar escrever o caminho completo.
 
 ---
 
-## Parte 3 - Instalando as ferramentas nf-core
+## Parte 3 - Verificando se tudo está funcionando
 
-O **nf-core** é uma comunidade que mantém pipelines bioinformáticos padronizados. Além dos pipelines em si (que o Nextflow baixa automaticamente), existe um pacote de ferramentas de linha de comando que facilita tarefas como baixar pipelines, gerar samplesheets e baixar dados do SRA.
+Antes de rodar seus dados reais, execute estes testes em ordem para confirmar que o ambiente está correto.
 
-### 3.1 Instalar as ferramentas nf-core via pip
-
-```bash
-# Verificar se o pip está instalado
-pip --version
-
-# Se não estiver, instalar:
-# Ubuntu/Debian:
-sudo apt-get install -y python3-pip
-
-# macOS:
-brew install python3
-
-# Instalar as ferramentas nf-core
-pip install nf-core
-
-# Ou, se preferir instalar apenas para o seu usuário (sem sudo):
-pip install --user nf-core
-```
-
-### 3.2 Verificar a instalação do nf-core
+### 3.1 Testar o Docker
 
 ```bash
-nf-core --version
-```
-
-**O que você deve ver:**
-```
-                                          ,--./,-.
-          ___     __   __   __   ___     /,-._.--~\
-    |\ | |__  __ /  ` /  \ |__) |__         }  {
-    | \| |       \__, \__/ |  \ |___     \`-._,-`-,
-                                          `._,._,'
-
-    nf-core/tools version 2.x.x - https://nf-co.re
-```
-
----
-
-## Parte 4 - Verificando se tudo está funcionando
-
-Antes de rodar seus dados reais, execute estes testes para confirmar que o ambiente está correto.
-
-### 4.1 Verificar Docker
-
-```bash
-# Verificar a versão do Docker
+# Verificar a versão instalada
 docker --version
-# Esperado: Docker version 24.x.x, build ...
 
-# Testar se o Docker consegue baixar e rodar containers
+# Rodar o container de teste oficial do Docker
 docker run hello-world
 ```
 
-**O que você deve ver após `docker run hello-world`:**
+Se o Docker estiver funcionando, você verá:
 ```
 Hello from Docker!
 This message shows that your installation appears to be working correctly.
-...
 ```
 
-Se aparecer essa mensagem, o Docker está funcionando. O que aconteceu: o Docker baixou uma imagem mínima chamada `hello-world` do Docker Hub (repositório público de imagens) e a executou dentro de um container.
+O que aconteceu: o Docker baixou uma imagem mínima chamada `hello-world` do **Docker Hub** (repositório público de imagens em hub.docker.com) e a executou dentro de um container. Esse é exatamente o mecanismo que o Nextflow usará para cada ferramenta do pipeline.
 
-### 4.2 Verificar Nextflow com Docker
+### 3.2 Testar o Nextflow com Docker
 
 ```bash
-# Testar o Nextflow com um pipeline simples de exemplo
-# Este comando baixa e executa um hello-world do Nextflow
+# Rodar um pipeline de hello-world do Nextflow usando Docker
 nextflow run hello -profile docker
 ```
 
-**O que deve acontecer:** o Nextflow vai baixar um pipeline de teste, criar containers Docker para cada processo e executar. No final, você deve ver algo como:
+Você deve ver:
 ```
 N E X T F L O W  ~  version 24.x.x
-Launching `https://github.com/nextflow-io/hello` [happy_...] DSL2 - revision: ...
 executor >  local (4)
 [xx/xxxxxx] process > sayHello (1) [100%] 4 of 4
 Hola world!
@@ -377,49 +278,56 @@ Ciao world!
 Bonjour world!
 ```
 
-### 4.3 Testar o pipeline nf-core/rnaseq com dados de exemplo
+### 3.3 Testar o pipeline nf-core/rnaseq com dados de exemplo
 
-O nf-core/rnaseq inclui um perfil de teste (`-profile test`) que usa dados minúsculos para verificar se o pipeline funciona:
+Este é o teste mais importante: ele baixa e executa o pipeline completo com um pequeno dataset de exemplo.
 
 ```bash
-# Criar um diretório para o teste
+# Criar diretório para o teste
 mkdir -p ~/teste_rnaseq/resultados
 
 # Rodar o pipeline com o perfil de teste
-# Isso vai baixar o pipeline e todos os containers automaticamente
-# AVISO: pode demorar 10-30 minutos na primeira vez (baixando containers)
+# AVISO: pode demorar 10-30 minutos na primeira vez
+# (Nextflow baixa todos os containers Docker automaticamente)
 nextflow run nf-core/rnaseq \
     -profile test,docker \
     --outdir ~/teste_rnaseq/resultados
 ```
 
-**O que acontece durante a execução:**
-- O Nextflow baixa o código do pipeline nf-core/rnaseq do GitHub
-- Para cada ferramenta (STAR, Salmon, FastQC, etc.), o Nextflow baixa automaticamente o container Docker correspondente do Docker Hub
-- Os containers são armazenados localmente em cache, então da segunda vez é muito mais rápido
-- O pipeline executa com um pequeno dataset de teste
+**O que acontece durante essa execução:**
+1. O Nextflow baixa o código do pipeline nf-core/rnaseq do GitHub
+2. Para cada ferramenta (STAR, Salmon, FastQC, etc.), o Nextflow verifica se o container Docker já está no cache local
+3. Se não estiver, o container é baixado automaticamente do Docker Hub
+4. Cada ferramenta é executada dentro do seu próprio container isolado
+5. Os containers são armazenados em cache -execuções futuras são muito mais rápidas
 
-**Se finalizar sem erros**, você verá:
+Se finalizar sem erros, você verá:
 ```
 -[nf-core/rnaseq] Pipeline completed successfully -
 ```
 
+**Isso confirma que Docker + Nextflow + nf-core/rnaseq estão funcionando corretamente.**
+
 ---
 
-## Parte 5 - Baixando os dados do tutorial (SRA)
+## Parte 4 - Baixando os dados do tutorial (SRA)
 
 Vamos usar o dataset **Xia et al, 2021** (SRP282921), que é um experimento de QuantSeq 3' RNA-Seq em camundongos, sem UMIs. São 36 amostras disponíveis gratuitamente no NCBI SRA.
 
-### 5.1 O que é o SRA e o nf-core/fetchngs
+### 4.1 O que é o SRA e o nf-core/fetchngs
 
-O **SRA (Sequence Read Archive)** é o maior repositório público de dados de sequenciamento do mundo, mantido pelo NCBI. Todos os artigos publicados são obrigados a depositar os dados brutos lá.
+O **SRA (Sequence Read Archive)** é o maior repositório público de dados de sequenciamento do mundo, mantido pelo NCBI. Todos os artigos científicos publicados são obrigados a depositar os dados brutos lá.
 
-O pipeline **nf-core/fetchngs** automatiza o download de dados do SRA, incluindo:
-- Download dos arquivos FASTQ
-- Geração automática de um samplesheet compatível com nf-core/rnaseq
-- Conversão do formato SRA para FASTQ
+O pipeline **nf-core/fetchngs** automatiza o download de dados do SRA. Como ele também usa Docker, não é necessário instalar nenhuma ferramenta de download manualmente -o Nextflow cuida de tudo.
 
-### 5.2 Criar o arquivo de IDs para download
+O nf-core/fetchngs faz três coisas:
+- Baixa os arquivos FASTQ diretamente do SRA
+- Converte do formato SRA para FASTQ (quando necessário)
+- Gera automaticamente um samplesheet compatível com nf-core/rnaseq
+
+### 4.2 Preparar o diretório e o arquivo de IDs
+
+O arquivo `ids.txt` com o ID do estudo já está neste repositório. Basta copiar para o seu diretório de trabalho:
 
 ```bash
 # Criar o diretório do tutorial
@@ -427,77 +335,64 @@ mkdir -p ~/tutorial-quantseq
 cd ~/tutorial-quantseq
 
 # Criar o arquivo com o ID do estudo SRA
+# (ou copiar o ids.txt que está neste repositório)
 echo "SRP282921" > ids.txt
 
 # Verificar o conteúdo
 cat ids.txt
+# Deve mostrar: SRP282921
 ```
 
 **Por que um arquivo de IDs:** o nf-core/fetchngs aceita como entrada um arquivo de texto simples com os IDs do SRA que você quer baixar. Pode ser um ID de estudo (SRP...), de amostra (SRX...) ou de run (SRR...).
 
-### 5.3 Baixar os dados com nf-core/fetchngs
+### 4.3 Baixar os dados com nf-core/fetchngs
 
 ```bash
-# Criar os diretórios
-mkdir -p ~/tutorial-quantseq/{fastq,resultados_rnaseq}
+mkdir -p ~/tutorial-quantseq/fastq
 
 # Rodar o nf-core/fetchngs para baixar os FASTQs
+# Tudo roda dentro de containers Docker -não precisa instalar nada
 nextflow run nf-core/fetchngs \
     --input ids.txt \
     --outdir ~/tutorial-quantseq/fastq \
     -profile docker
+```
 
-# O download pode demorar bastante dependendo da sua conexão.
-# Para rodar em segundo plano e salvar o log:
+O download de 36 amostras pode demorar bastante. Para rodar em segundo plano e salvar o log:
+
+```bash
 nohup nextflow run nf-core/fetchngs \
     --input ids.txt \
     --outdir ~/tutorial-quantseq/fastq \
     -profile docker \
     > ~/tutorial-quantseq/log_fetchngs.txt 2>&1 &
 
-# Acompanhar o progresso:
+# Acompanhar o progresso em tempo real:
 tail -f ~/tutorial-quantseq/log_fetchngs.txt
 ```
 
-**O que o nf-core/fetchngs baixa:**
+### 4.4 O que o fetchngs baixa
 
 Após o download, você encontrará:
+
 ```
 ~/tutorial-quantseq/fastq/
 ├── fastq/
-│   ├── SRR12345678_1.fastq.gz   # arquivo R1 (forward)
-│   ├── SRR12345678_2.fastq.gz   # arquivo R2 (reverse) -- se paired-end
-│   └── ...                       # (QuantSeq é single-end, só terá R1)
+│   ├── SRR12345678_1.fastq.gz   # arquivo FASTQ de cada amostra
+│   └── ...                       # (QuantSeq é single-end, só há R1)
 └── samplesheet/
     └── samplesheet.csv           # samplesheet pronto para nf-core/rnaseq!
 ```
 
-**Dica importante:** o nf-core/fetchngs gera automaticamente o `samplesheet.csv` no formato correto para ser usado diretamente com o nf-core/rnaseq. Isso economiza muito trabalho!
-
-### 5.4 (Alternativa) Baixar manualmente via SRA-toolkit
-
-Se preferir baixar manualmente, instale o SRA-toolkit:
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install -y sra-toolkit
-
-# macOS com Homebrew
-brew install sratoolkit
-
-# Baixar uma amostra específica (exemplo)
-fastq-dump --split-files --gzip SRR12345678
-
-# Para baixar todas as amostras de um estudo, use o nf-core/fetchngs (mais fácil)
-```
+O `samplesheet.csv` gerado automaticamente já está no formato correto para ser usado diretamente na próxima etapa.
 
 ---
 
-## Parte 6 - Preparando o samplesheet
+## Parte 5 - Preparando o samplesheet
 
-O **samplesheet** é um arquivo CSV que informa ao pipeline: quais amostras processar, onde estão os arquivos FASTQ, e qual é a orientação da biblioteca.
+O **samplesheet** é um arquivo CSV que informa ao pipeline: quais amostras processar, onde estão os arquivos FASTQ e qual é a orientação da biblioteca.
 
-### 6.1 Samplesheet gerado automaticamente pelo fetchngs
+### 5.1 Samplesheet gerado automaticamente
 
 Se você usou o nf-core/fetchngs, o samplesheet já está pronto em:
 ```
@@ -509,13 +404,9 @@ Verifique o conteúdo:
 head -5 ~/tutorial-quantseq/fastq/samplesheet/samplesheet.csv
 ```
 
-### 6.2 Estrutura do samplesheet
+### 5.2 Estrutura do samplesheet
 
 O samplesheet tem 4 colunas obrigatórias:
-
-```csv
-sample,fastq_1,fastq_2,strandedness
-```
 
 | Coluna | O que é | Exemplo |
 |--------|---------|---------|
@@ -524,20 +415,20 @@ sample,fastq_1,fastq_2,strandedness
 | `fastq_2` | Caminho para FASTQ R2 (vazio se single-end) | _(vazio)_ |
 | `strandedness` | Orientação da biblioteca | `forward` |
 
-**Para QuantSeq:** os dados são **single-end** (só há R1) e a biblioteca é **forward** (strand-specific sentido forward, característica do protocolo QuantSeq da Lexogen).
+**Para QuantSeq:** os dados são **single-end** (só há R1, sem R2) e a biblioteca é **forward** (característica do protocolo QuantSeq da Lexogen).
 
-### 6.3 Exemplo de samplesheet para QuantSeq
+### 5.3 Exemplo de samplesheet para QuantSeq
 
-Se precisar criar manualmente, o formato é:
+Se precisar criar ou ajustar manualmente (use o `samplesheet_template.csv` deste repositório como modelo):
 
 ```csv
 sample,fastq_1,fastq_2,strandedness
-CTRL_REP1,/home/user/tutorial-quantseq/fastq/SRR12345678_1.fastq.gz,,forward
-CTRL_REP2,/home/user/tutorial-quantseq/fastq/SRR12345679_1.fastq.gz,,forward
-CTRL_REP3,/home/user/tutorial-quantseq/fastq/SRR12345680_1.fastq.gz,,forward
-TREAT_REP1,/home/user/tutorial-quantseq/fastq/SRR12345681_1.fastq.gz,,forward
-TREAT_REP2,/home/user/tutorial-quantseq/fastq/SRR12345682_1.fastq.gz,,forward
-TREAT_REP3,/home/user/tutorial-quantseq/fastq/SRR12345683_1.fastq.gz,,forward
+CTRL_REP1,/home/usuario/tutorial-quantseq/fastq/SRR12345678_1.fastq.gz,,forward
+CTRL_REP2,/home/usuario/tutorial-quantseq/fastq/SRR12345679_1.fastq.gz,,forward
+CTRL_REP3,/home/usuario/tutorial-quantseq/fastq/SRR12345680_1.fastq.gz,,forward
+TREAT_REP1,/home/usuario/tutorial-quantseq/fastq/SRR12345681_1.fastq.gz,,forward
+TREAT_REP2,/home/usuario/tutorial-quantseq/fastq/SRR12345682_1.fastq.gz,,forward
+TREAT_REP3,/home/usuario/tutorial-quantseq/fastq/SRR12345683_1.fastq.gz,,forward
 ```
 
 **Regras importantes:**
@@ -546,11 +437,9 @@ TREAT_REP3,/home/user/tutorial-quantseq/fastq/SRR12345683_1.fastq.gz,,forward
 - Não use espaços nos nomes das amostras (use underscores `_`)
 - Os arquivos devem estar compactados com gzip (extensão `.fastq.gz`)
 
-### 6.4 Verificar o genoma de referência
+### 5.4 Baixar o genoma de referência
 
 O dataset Xia et al usa camundongo. Vamos usar o genoma **GRCm38** (mm10) com a anotação **Gencode release M17**.
-
-Para baixar o genoma de referência:
 
 ```bash
 mkdir -p ~/tutorial-quantseq/referencia
@@ -562,98 +451,84 @@ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M17/GRCm3
 # Anotação do genoma (GTF)
 wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M17/gencode.vM17.primary_assembly.annotation.gtf.gz
 
-# Descompactar
+# Descompactar os dois arquivos
 gunzip GRCm38.primary_assembly.genome.fa.gz
 gunzip gencode.vM17.primary_assembly.annotation.gtf.gz
+
+cd ~/tutorial-quantseq
 ```
 
-**Por que esses arquivos:**
-- **FASTA (`.fa`):** contém a sequência de DNA de todos os cromossomos do camundongo - é o "mapa" onde os reads serão alinhados
-- **GTF (`.gtf`):** contém as coordenadas de todos os genes conhecidos - define onde cada gene começa e termina, necessário para quantificar a expressão
+**O que são esses dois arquivos:**
+- **FASTA (`.fa`):** contém a sequência de DNA de todos os cromossomos do camundongo -é o "mapa" onde os reads serão alinhados
+- **GTF (`.gtf`):** contém as coordenadas de todos os genes conhecidos -define onde cada gene começa e termina, necessário para quantificar a expressão
 
 ---
 
-## Parte 7 - Executando o pipeline nf-core/rnaseq
+## Parte 6 - Executando o pipeline nf-core/rnaseq
 
-### 7.1 Configurar os parâmetros do pipeline
+### 6.1 Verificar se o Docker está ativo
 
-Crie o arquivo de parâmetros `params.yaml`:
+```bash
+sudo systemctl status docker
+# Deve mostrar: Active: active (running)
+
+# Se estiver parado:
+sudo systemctl start docker
+```
+
+### 6.2 Configurar os parâmetros do pipeline
+
+Crie o arquivo de parâmetros `params.yaml` (ou use o `params_exemplo.yaml` deste repositório como base):
 
 ```bash
 cat > ~/tutorial-quantseq/params.yaml << 'EOF'
 # Parâmetros do pipeline nf-core/rnaseq
 # Dataset: Xia et al 2021 (SRP282921) - QuantSeq 3' RNA-Seq, camundongo
 
-# Arquivos de entrada
 input: '/home/SEU_USUARIO/tutorial-quantseq/fastq/samplesheet/samplesheet.csv'
 outdir: '/home/SEU_USUARIO/tutorial-quantseq/resultados_rnaseq'
 
-# Genoma de referência
 fasta: '/home/SEU_USUARIO/tutorial-quantseq/referencia/GRCm38.primary_assembly.genome.fa'
 gtf: '/home/SEU_USUARIO/tutorial-quantseq/referencia/gencode.vM17.primary_assembly.annotation.gtf'
 
-# Alinhador: STAR + Salmon (padrão e recomendado)
 aligner: 'star_salmon'
 
-# Configurações específicas para QuantSeq 3' mRNA-Seq
-# QuantSeq captura apenas a região 3', então precisamos
-# recortar os primeiros 12 bases (poli-A da extremidade 3')
+# Remove os primeiros 12 nucleotídeos (região de baixa qualidade no QuantSeq 3')
 extra_trimgalore_args: '--clip_r1 12'
-
-# Limitar memória e CPU se necessário (ajuste conforme seu computador)
-# max_memory: '16.GB'
-# max_cpus: 8
 EOF
 ```
 
-**Substituir `SEU_USUARIO`** pelo seu nome de usuário no sistema. Para saber qual é:
+Substitua `SEU_USUARIO` pelo seu nome de usuário. Para saber qual é:
 ```bash
 echo $USER
-# ou
-whoami
 ```
 
-### 7.2 Verificar se o Docker está rodando
-
-```bash
-# Verificar se o Docker está ativo
-docker info
-
-# Se aparecer erro "Cannot connect to the Docker daemon":
-# - macOS/Windows: abra o aplicativo Docker Desktop
-# - Linux: sudo systemctl start docker
-```
-
-### 7.3 Rodar o pipeline
+### 6.3 Executar o pipeline
 
 ```bash
 cd ~/tutorial-quantseq
 
-# Executar o pipeline
 nextflow run nf-core/rnaseq \
     -profile docker \
     -params-file params.yaml \
     -r 3.10.1
 ```
 
-**Explicação de cada parâmetro:**
-- `nf-core/rnaseq`: nome do pipeline (o Nextflow baixa automaticamente do GitHub)
-- `-profile docker`: instrui o Nextflow a usar Docker para cada ferramenta
-- `-params-file params.yaml`: lê os parâmetros do arquivo que criamos
-- `-r 3.10.1`: versão específica do pipeline (garante reprodutibilidade)
+**Explicação de cada argumento:**
 
-### 7.4 O que acontece durante a execução
+| Argumento | Função |
+|-----------|--------|
+| `nf-core/rnaseq` | Nome do pipeline -o Nextflow baixa automaticamente do GitHub |
+| `-profile docker` | Instrui o Nextflow a executar cada ferramenta dentro de um container Docker |
+| `-params-file params.yaml` | Lê os parâmetros do arquivo que criamos |
+| `-r 3.10.1` | Versão específica do pipeline -garante que o resultado é reprodutível |
 
-A primeira execução é mais lenta porque o Nextflow precisa baixar todos os containers Docker. Para um experimento com 36 amostras, espere entre 4 e 24 horas dependendo do computador.
+### 6.4 O que acontece durante a execução
 
 Você verá uma saída parecida com:
 ```
 N E X T F L O W  ~  version 24.x.x
 Launching `nf-core/rnaseq` [jolly_torvalds] DSL2 - revision: ...
-Core Nextflow options
-  runName        : jolly_torvalds
-  containerEngine: docker
-  ...
 
 executor >  local (142)
 [xx/xxxxxx] process > NFCORE_RNASEQ:RNASEQ:PREPARE_GENOME:GTF_FILTER     [100%] 1 of 1
@@ -661,21 +536,11 @@ executor >  local (142)
 ...
 ```
 
-**Retomando uma execução interrompida** (queda de energia, timeout, etc.):
+A primeira execução é mais lenta porque o Nextflow precisa baixar todos os containers Docker. Para um experimento com 36 amostras, espere entre 4 e 24 horas dependendo dos recursos do computador.
 
-```bash
-nextflow run nf-core/rnaseq \
-    -profile docker \
-    -params-file params.yaml \
-    -r 3.10.1 \
-    -resume
-```
+### 6.5 Rodar em segundo plano
 
-O `-resume` é uma das melhores funcionalidades do Nextflow: ele verifica quais etapas já foram concluídas e retoma de onde parou, sem refazer o que já foi feito.
-
-### 7.5 Rodar em segundo plano
-
-Para execuções longas, use `screen` ou `nohup` para que o pipeline continue mesmo se você fechar o terminal:
+Para não perder a execução caso o terminal feche:
 
 ```bash
 # Opção 1: com nohup (mais simples)
@@ -685,10 +550,10 @@ nohup nextflow run nf-core/rnaseq \
     -r 3.10.1 \
     > log_rnaseq.txt 2>&1 &
 
-# Ver o progresso:
+# Acompanhar o progresso:
 tail -f log_rnaseq.txt
 
-# Opção 2: com screen (mais controle)
+# Opção 2: com screen (permite reconectar ao terminal)
 screen -S rnaseq_tutorial
 
 nextflow run nf-core/rnaseq \
@@ -696,17 +561,31 @@ nextflow run nf-core/rnaseq \
     -params-file params.yaml \
     -r 3.10.1
 
-# Para desanexar (pipeline continua rodando): pressione Ctrl+A, depois D
+# Para desanexar sem parar o pipeline: Ctrl+A, depois D
 # Para reconectar: screen -r rnaseq_tutorial
 ```
 
+### 6.6 Retomar uma execução interrompida
+
+Se o pipeline falhar ou for interrompido (queda de energia, falta de memória, etc.), use `-resume`:
+
+```bash
+nextflow run nf-core/rnaseq \
+    -profile docker \
+    -params-file params.yaml \
+    -r 3.10.1 \
+    -resume
+```
+
+O `-resume` é uma das melhores funcionalidades do Nextflow: ele verifica quais etapas já foram concluídas e retoma de onde parou, sem refazer o que já foi feito. Isso economiza muito tempo.
+
 ---
 
-## Parte 8 - Entendendo os resultados
+## Parte 7 - Entendendo os resultados
 
 Após a execução bem-sucedida, os resultados estarão em `~/tutorial-quantseq/resultados_rnaseq/`.
 
-### 8.1 Estrutura dos resultados
+### 7.1 Estrutura dos resultados
 
 ```
 resultados_rnaseq/
@@ -723,15 +602,12 @@ resultados_rnaseq/
     └── execution_report.html    # Relatório de execução do pipeline
 ```
 
-### 8.2 Primeiro: abrir o MultiQC
+### 7.2 Abrir o relatório MultiQC
 
 O relatório **MultiQC** consolida todas as métricas de qualidade em um único arquivo HTML interativo. É o primeiro lugar a olhar depois da execução:
 
 ```bash
-# macOS
-open resultados_rnaseq/multiqc/multiqc_report.html
-
-# Linux
+# Abrir no navegador (Ubuntu)
 xdg-open resultados_rnaseq/multiqc/multiqc_report.html
 ```
 
@@ -745,7 +621,7 @@ xdg-open resultados_rnaseq/multiqc/multiqc_report.html
 | Gene Body Coverage | Distribuição de reads ao longo dos genes | Para QuantSeq: acumulação na extremidade 3' é esperado |
 | PCA Plot | Agrupamento das amostras | Réplicas biológicas devem se agrupar |
 
-### 8.3 A matriz de contagem de genes
+### 7.3 A matriz de contagem de genes
 
 O arquivo mais importante para análise downstream é:
 ```
@@ -764,7 +640,7 @@ Esta matriz é a entrada para análises de expressão diferencial com DESeq2 ou 
 head -5 resultados_rnaseq/star_salmon/salmon.merged.gene_counts.tsv
 ```
 
-### 8.4 Próximos passos
+### 7.4 Próximos passos
 
 Com a matriz de contagem em mãos, os próximos passos típicos são:
 
@@ -778,16 +654,14 @@ Veja o README principal do projeto (`../README.md`) para instruções detalhadas
 
 ## Solução de problemas comuns
 
-### "Docker daemon is not running" ou "Cannot connect to Docker daemon"
-
-O Docker não está iniciado.
+### Docker não está rodando
 
 ```bash
-# macOS/Windows: abra o aplicativo Docker Desktop e aguarde inicializar
+# Verificar status
+sudo systemctl status docker
 
-# Linux:
+# Iniciar
 sudo systemctl start docker
-sudo systemctl status docker   # deve mostrar "active (running)"
 ```
 
 ### "permission denied while trying to connect to the Docker daemon"
@@ -795,10 +669,7 @@ sudo systemctl status docker   # deve mostrar "active (running)"
 Seu usuário não tem permissão para usar o Docker sem sudo.
 
 ```bash
-# Adicionar usuário ao grupo docker
 sudo usermod -aG docker $USER
-
-# Aplicar sem precisar de logout (ou faça logout/login)
 newgrp docker
 
 # Testar
@@ -807,7 +678,7 @@ docker run hello-world
 
 ### "No space left on device"
 
-O Docker acumulou muitas imagens antigas. Libere espaço:
+O Docker acumulou imagens antigas que estão ocupando espaço em disco.
 
 ```bash
 # Ver quanto espaço o Docker está usando
@@ -820,46 +691,43 @@ docker system prune -a
 df -h
 ```
 
-### Pipeline muito lento ou travado
+### Pipeline muito lento ou sem resposta
 
 ```bash
-# Ver os processos em execução no Docker
+# Ver os containers em execução
 docker ps
 
-# Ver uso de recursos
+# Ver uso de CPU e RAM em tempo real
 docker stats
-
-# Se necessário, limitar recursos no params.yaml:
-# max_memory: '8.GB'
-# max_cpus: 4
 ```
 
-### "OutOfMemoryError" ou processo morto por falta de RAM
+Se a RAM estiver esgotada, adicione ao `params.yaml`:
+```yaml
+max_memory: '12.GB'
+max_cpus: 4
+```
 
-A etapa de indexação do STAR precisa de muita RAM (~30 GB para o genoma humano/camundongo). Se seu computador tem menos RAM:
+### "OutOfMemoryError" na etapa de indexação do STAR
 
-```bash
+O STAR precisa de ~30 GB de RAM para indexar o genoma do camundongo. Se não houver RAM suficiente, use o pseudo-alinhamento (usa muito menos memória):
+
+```yaml
 # Adicionar ao params.yaml:
-# max_memory: '12.GB'
-
-# Ou usar o pseudo-alinhamento (Salmon sem STAR) que usa muito menos RAM:
-# pseudo_aligner: 'salmon'
-# skip_alignment: true
+pseudo_aligner: 'salmon'
+skip_alignment: true
 ```
 
-### Nextflow não encontra o arquivo de samplesheet
+### Nextflow não encontra o samplesheet ou os FASTQs
 
-Use sempre **caminhos absolutos** no samplesheet e no params.yaml:
+Use sempre **caminhos absolutos**. Para descobrir o caminho absoluto de um arquivo:
 
 ```bash
-# Para descobrir o caminho absoluto de um arquivo:
 realpath samplesheet.csv
 ```
 
 ### Pipeline falhou no meio, como retomar
 
 ```bash
-# SEMPRE use -resume para retomar
 nextflow run nf-core/rnaseq \
     -profile docker \
     -params-file params.yaml \
@@ -867,17 +735,17 @@ nextflow run nf-core/rnaseq \
     -resume
 ```
 
-### Ver os logs detalhados de um processo que falhou
+### Ver os logs de um processo que falhou
+
+O Nextflow informa o hash do processo que falhou (ex: `[ab/cd1234]`). Os logs ficam em:
 
 ```bash
-# Ver os logs do Nextflow
+# Log completo do Nextflow
 cat .nextflow.log
 
-# Os diretórios de trabalho ficam em ./work/
-# O Nextflow informa o hash do processo que falhou, ex: [ab/cd1234]
-# Os logs desse processo ficam em:
-cat work/ab/cd1234.../[nome_do_processo]/.command.log
-cat work/ab/cd1234.../[nome_do_processo]/.command.err
+# Logs do processo específico
+cat work/ab/cd1234*/[nome_do_processo]/.command.log
+cat work/ab/cd1234*/[nome_do_processo]/.command.err
 ```
 
 ---
@@ -895,15 +763,15 @@ cat work/ab/cd1234.../[nome_do_processo]/.command.err
 | **nf-core** | Comunidade que desenvolve e mantém pipelines Nextflow padronizados |
 | **Pipeline** | Sequência automatizada de etapas de processamento bioinformático |
 | **Samplesheet** | Arquivo CSV que lista as amostras e onde estão os FASTQs |
-| **SRA** | Sequence Read Archive - repositório de dados de sequenciamento do NCBI |
+| **SRA** | Sequence Read Archive -repositório de dados de sequenciamento do NCBI |
 | **GTF/GFF** | Formato de anotação genômica (coordenadas de genes, exons, etc.) |
 | **FASTA** | Formato de arquivo de sequência de DNA/RNA |
 | **STAR** | Alinhador de reads de RNA-Seq ao genoma |
 | **Salmon** | Ferramenta de quantificação de expressão gênica |
 | **MultiQC** | Ferramenta que consolida relatórios de qualidade em um HTML interativo |
-| **TPM** | Transcripts Per Million - métrica de expressão normalizada |
+| **TPM** | Transcripts Per Million -métrica de expressão normalizada |
 | **Raw counts** | Contagem bruta de reads por gene (entrada para análise diferencial) |
-| **DEGs** | Differentially Expressed Genes - genes diferencialmente expressos |
+| **DEGs** | Differentially Expressed Genes -genes diferencialmente expressos |
 
 ---
 
@@ -913,6 +781,6 @@ cat work/ab/cd1234.../[nome_do_processo]/.command.err
 - **Documentação nf-core/rnaseq:** https://nf-co.re/rnaseq
 - **Documentação nf-core/fetchngs:** https://nf-co.re/fetchngs
 - **Documentação do Nextflow:** https://www.nextflow.io/docs/latest/
-- **Documentação do Docker:** https://docs.docker.com/get-started/
+- **Documentação do Docker:** https://docs.docker.com/engine/install/ubuntu/
 - **Dataset Xia et al 2021 (SRP282921):** https://www.ncbi.nlm.nih.gov/sra/SRP282921
 - **Dataset Nugent et al 2020 (SRP213880):** https://www.ncbi.nlm.nih.gov/sra/SRP213880

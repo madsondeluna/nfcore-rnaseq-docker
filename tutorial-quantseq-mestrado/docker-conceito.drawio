@@ -1,0 +1,139 @@
+<mxfile host="65bd71144e">
+    <diagram id="QL1tcvhahLMAOvbWmGUK" name="Page-1">
+        <mxGraphModel dx="616" dy="733" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="600" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="Por que usar Docker em bioinformática?" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="150" y="20" width="860" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Sem Docker" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#AE4132;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="75" width="360" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;arcSize=5;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="120" width="360" height="380" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="Seu computador" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="127" width="360" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="Python 3.11" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="175" width="280" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="NumPy 1.24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="245" width="280" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="STAR 2.7.10a" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="315" width="280" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="Conflitos de versão!&lt;br&gt;Difícil reproduzir em outro computador." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#AE4132;fontSize=12;fontStyle=1;fontColor=#AE4132;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="390" width="280" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="Solução →" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#23A45A;strokeColor=#23A45A;fontColor=#FFFFFF;fontSize=14;fontStyle=1;arcSize=50;" parent="1" vertex="1">
+                    <mxGeometry x="450" y="280" width="140" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="Com Docker" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#23A45A;" parent="1" vertex="1">
+                    <mxGeometry x="640" y="75" width="420" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;arcSize=5;" parent="1" vertex="1">
+                    <mxGeometry x="640" y="120" width="420" height="380" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="Seu computador + Docker Engine" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="640" y="127" width="420" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="Container: FastQC&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;Python 3.7 - todas as dependencias inclusas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" parent="1" vertex="1">
+                    <mxGeometry x="672" y="175" width="356" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="Container: STAR&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;STAR 2.7.9a - dependencias proprias e isoladas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" parent="1" vertex="1">
+                    <mxGeometry x="672" y="253" width="356" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="Container: Salmon&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;Salmon 1.9 - dependencias proprias e isoladas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" parent="1" vertex="1">
+                    <mxGeometry x="672" y="331" width="356" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="Sem conflitos! Reprodutivel em&lt;br&gt;qualquer computador com Docker." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#23A45A;fontSize=12;fontStyle=1;fontColor=#23A45A;" parent="1" vertex="1">
+                    <mxGeometry x="672" y="408" width="356" height="52" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="O Nextflow baixa automaticamente cada container do Docker Hub quando necessário, você não precisa instalar STAR, Salmon, FastQC, etc." style="text;html=1;strokeColor=#AAAAAA;fillColor=#f5f5f5;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="520" width="1000" height="40" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="a5FU578krD9PoNcUQTd-" name="Page-1">
+        <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="600" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <!-- Título principal -->
+                <mxCell id="2" value="Por que usar Docker em bioinformática?" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="20" width="860" height="40" as="geometry"/>
+                </mxCell>
+                <!-- ====== LADO ESQUERDO: SEM DOCKER ====== -->
+                <!-- Título "Sem Docker" -->
+                <mxCell id="3" value="Sem Docker" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#AE4132;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="75" width="360" height="35" as="geometry"/>
+                </mxCell>
+                <!-- Caixa: Seu computador (sem Docker) -->
+                <mxCell id="4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;arcSize=5;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="120" width="360" height="380" as="geometry"/>
+                </mxCell>
+                <!-- Label do computador -->
+                <mxCell id="5" value="Seu computador" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="127" width="360" height="30" as="geometry"/>
+                </mxCell>
+                <!-- Pacote Python -->
+                <mxCell id="6" value="Python 3.11" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="175" width="280" height="50" as="geometry"/>
+                </mxCell>
+                <!-- Pacote NumPy -->
+                <mxCell id="7" value="NumPy 1.24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="245" width="280" height="50" as="geometry"/>
+                </mxCell>
+                <!-- Pacote STAR -->
+                <mxCell id="8" value="STAR 2.7.10a" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="315" width="280" height="50" as="geometry"/>
+                </mxCell>
+                <!-- Problema: conflito -->
+                <mxCell id="9" value="Conflitos de versão!&lt;br&gt;Difícil reproduzir em outro computador." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#AE4132;fontSize=12;fontStyle=1;fontColor=#AE4132;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="390" width="280" height="70" as="geometry"/>
+                </mxCell>
+                <!-- ====== SETA CENTRAL ====== -->
+                <mxCell id="10" value="Solução →" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#23A45A;strokeColor=#23A45A;fontColor=#FFFFFF;fontSize=14;fontStyle=1;arcSize=50;" vertex="1" parent="1">
+                    <mxGeometry x="450" y="280" width="140" height="50" as="geometry"/>
+                </mxCell>
+                <!-- ====== LADO DIREITO: COM DOCKER ====== -->
+                <!-- Título "Com Docker" -->
+                <mxCell id="11" value="Com Docker" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#23A45A;" vertex="1" parent="1">
+                    <mxGeometry x="640" y="75" width="420" height="35" as="geometry"/>
+                </mxCell>
+                <!-- Caixa: Seu computador (com Docker) -->
+                <mxCell id="12" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;arcSize=5;" vertex="1" parent="1">
+                    <mxGeometry x="640" y="120" width="420" height="380" as="geometry"/>
+                </mxCell>
+                <!-- Label do computador com Docker -->
+                <mxCell id="13" value="Seu computador + Docker Engine" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+                    <mxGeometry x="640" y="127" width="420" height="30" as="geometry"/>
+                </mxCell>
+                <!-- Container 1: FastQC -->
+                <mxCell id="14" value="Container: FastQC&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;Python 3.7 - todas as dependencias inclusas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1">
+                    <mxGeometry x="672" y="175" width="356" height="60" as="geometry"/>
+                </mxCell>
+                <!-- Container 2: STAR -->
+                <mxCell id="15" value="Container: STAR&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;STAR 2.7.9a - dependencias proprias e isoladas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1">
+                    <mxGeometry x="672" y="253" width="356" height="60" as="geometry"/>
+                </mxCell>
+                <!-- Container 3: Salmon -->
+                <mxCell id="16" value="Container: Salmon&lt;br&gt;&lt;font style=&quot;font-size: 11px;&quot;&gt;Salmon 1.9 - dependencias proprias e isoladas&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1">
+                    <mxGeometry x="672" y="331" width="356" height="60" as="geometry"/>
+                </mxCell>
+                <!-- Sucesso -->
+                <mxCell id="17" value="Sem conflitos! Reprodutivel em&lt;br&gt;qualquer computador com Docker." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#23A45A;fontSize=12;fontStyle=1;fontColor=#23A45A;" vertex="1" parent="1">
+                    <mxGeometry x="672" y="408" width="356" height="52" as="geometry"/>
+                </mxCell>
+                <!-- ====== RODAPE ====== -->
+                <mxCell id="18" value="O Nextflow baixa automaticamente cada container do Docker Hub quando necessario - voce nao precisa instalar STAR, Salmon, FastQC, etc." style="text;html=1;strokeColor=#AAAAAA;fillColor=#f5f5f5;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="520" width="1000" height="40" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
