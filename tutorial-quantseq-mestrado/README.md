@@ -72,7 +72,7 @@ Esse problema de **reprodutibilidade** é um dos maiores desafios da bioinformá
 
 O Docker resolve isso criando **containers**: pacotes completos e isolados que contêm o programa, todas as suas dependências, as versões exatas das bibliotecas e até o sistema operacional mínimo necessário para rodar. É como uma "caixa fechada" que funciona identicamente em qualquer computador que tenha Docker instalado.
 
-![Diagrama Docker](tutorial-quantseq-mestrado/docker-conceito.svg)
+![Diagrama Docker](docker-conceito.svg)
 
 ### Por que o nf-core usa Docker
 
